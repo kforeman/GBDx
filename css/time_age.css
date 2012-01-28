@@ -1,0 +1,32 @@
+.time.axis line, .time.axis path {
+  stroke: #444444;
+  fill: none;
+}
+
+.time.axis text {
+	fill: #444444;
+	text-shadow: none;
+	font-size: 14px;
+}
+
+.age.axis line, .age.axis path {
+  stroke: #444444;
+  fill: none;
+}
+
+.age.axis text {
+	fill: #444444;
+	text-shadow: none;
+	font-size: 12px;
+}
+
+.y.axis line, .y.axis path {
+  stroke: #444444;
+  fill: none;
+}
+
+.y.axis text {
+	fill: #444444;
+	text-shadow: none;
+	font-size: 12px;
+}

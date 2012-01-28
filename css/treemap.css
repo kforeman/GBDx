@@ -1,0 +1,31 @@
+/*	Author: 	Kyle Foreman
+	Date: 		8 January 2012
+	Purpose: 	Style treemaps
+*/
+
+.treemap_label {
+	text-anchor: start !important;
+	visibility: inherit !important;
+	text-shadow: 0px 0px 5px #000 !important;
+	fill: #fff !important;
+	alignment-baseline: text-before-edge !important;
+}
+
+.treemap_legend_text {
+	fill: #555;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.tree.axis line, .tree.axis path {
+  stroke: #555;
+  fill: none;
+}
+
+.tree.axis text {
+	fill: #555;
+	text-shadow: none;
+	font-size: 12px;
+}

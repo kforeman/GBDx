@@ -1,0 +1,13 @@
+/*	Author: 	Kyle Foreman
+	Date: 		3 January 2012
+	Purpose: 	Default font settings
+*/
+
+body {
+	font-family: 'Open Sans', sans-serif !important;
+	text-anchor: middle; 
+	alignment-baseline: middle; 
+	font-size: 18px;
+	text-shadow: 1px 1px 1px #cccccc;
+	filter: dropshadow(color=#cccccc, offx=1, offy=1);
+}

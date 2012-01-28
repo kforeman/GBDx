@@ -1,0 +1,114 @@
+/*	Author:		Kyle Foreman
+	Date: 		6 January 2012
+	Purpose: 	Lots of tweaks to menus (positioning, styling of select elements, etc)
+*/
+
+/* override the indentation of accordion elements */
+.ui-accordion-content {
+	padding: 0em 0em !important;
+}
+
+/* menu titles */
+.ui-accordion-header a {
+	font-size: 18px !important;
+	padding-left: .9em !important;
+}
+.ui-state-active, .ui-state-active a, .ui-state-hover a, .ui-state-hover span, .menu_label:hover  {
+	color: #ef3b2c !important;
+}
+
+/* condense icon position */
+.ui-icon {
+	left: .05em !important;
+}
+
+/* position menu elements */
+.accordion_section {
+	position: relative;
+	overflow-x: hidden !important;
+}
+.menu_label {
+	position: absolute;
+	font-weight: bold;
+	color: #555;
+	cursor: pointer;
+	margin-top: 2px;
+}
+.menu_control {
+	position: absolute;
+}
+#accordion {
+	margin-top: 50px;
+	z-index: 1;
+}
+#title {
+	z-index: 2;
+}
+
+.ui-slider {
+	height: 10px !important;
+	margin-top: 10px !important;
+	margin-left: 10px !important;
+	width: 120px !important;
+}
+.ui-slider-handle {
+	height: 18px !important;
+	width: 18px !important;
+	border-bottom-color: #AAA !important;
+	border-top-color: #AAA !important;
+	border-left-color: #AAA !important;
+	border-right-color: #AAA !important;
+}
+.slider_label {
+	position: relative;
+	left: 132px;
+	width: 68px !important;
+	top: -12px !important;
+	font-size: 12px;
+	font-weight: normal;
+	color: #555;
+	line-height: 10px !important;
+}
+
+.chzn-drop {
+	width: 193px !important;
+	border-top-color: #AAA !important;
+	border-top-width: 1px !important;
+	border-top-style: solid !important;
+}
+.active-result {
+	padding-bottom: 4px !important;
+	padding-top: 4px !important;
+}
+.chzn-single {
+	width: 185px !important;
+	height: 22px !important;
+	line-height: 22px !important;
+}
+.chzn-search input {
+	width: 158px !important;
+}
+.chzn-container-single .chzn-single div {
+	background-image: none !important;
+	background-color: #e6e6e6 !important;
+}
+.chzn-container-single .chzn-single div:hover {
+	background-color: #dadada !important;
+}
+
+.ui-button-text {
+	font-size: 14px !important;
+	padding-bottom: 0px !important;
+	padding-top: 0px !important;
+	font-weight: normal !important;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
+	border-top-color: #AAA !important;
+	border-bottom-color: #AAA !important;
+	border-left-color: #AAA !important;
+	border-right-color: #AAA !important;
+}
+
+.ui-state-focus {
+	outline-color: #5897FB !important;
+}

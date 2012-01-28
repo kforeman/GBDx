@@ -1,0 +1,25 @@
+.map_path {
+	stroke: #fff;
+	stroke-width: 1px;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.map.axis line, .map.axis path {
+  stroke: #555;
+  fill: none;
+}
+
+.map.axis text {
+	fill: #555;
+	text-shadow: none;
+	font-size: 12px;
+}
+
+.map_legend_title {
+	fill: #555;
+	text-shadow: none;
+	font-size: 15px;
+}

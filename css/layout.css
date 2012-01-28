@@ -1,0 +1,39 @@
+/*	Author: 	Kyle Foreman
+	Date: 		3 January 2012
+	Purpose: 	Basic layout parameters
+*/
+
+#title {
+	position: absolute;
+	left: 8px;
+	top: 10px;
+	font-size: 32px;
+	font-weight: bold;
+	color: #555;
+}
+
+#loading_indicator {
+	position: absolute;
+	left: 15px;
+	top: 17px;
+	z-index: 3;
+}
+
+#menu {
+	position: absolute;
+	z-index: 2;
+}
+
+#content {
+	float: left;
+	display: block;
+	margin-left: 5px;
+	z-index: 1;
+}
+
+.content_rect {
+	stroke: #AAA;
+	fill: none;
+	stroke-width: 1px;
+	shape-rendering: crisp-edges;
+}
