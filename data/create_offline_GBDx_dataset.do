@@ -18,6 +18,7 @@ Purpose:	Download the current GBD database and save it into csv files for offlin
 	global dsn CODMOD
 
 // ages
+	capture mkdir "$tmp_dir/parameters"
 	odbc load, exec("SELECT * FROM gbd_age ORDER BY age_viz;") dsn($dsn) clear
 	outsheet using "$tmp_dir/parameters/age_list.csv", comma replace
 
@@ -50,6 +51,7 @@ Purpose:	Download the current GBD database and save it into csv files for offlin
 	local metrics daly yld yll dth
 
 // treemap data
+	capture mkdir "$tmp_dir/treemap"
 	foreach g of local geo_sexes {
 		display "treemap `g'"
 		quietly keep if geo_sex == "`g'" 
@@ -64,6 +66,7 @@ Purpose:	Download the current GBD database and save it into csv files for offlin
 	}
 	
 // map data
+	capture mkdir "$tmp_dir/map"
 	foreach c of local cause_vizes {
 		display "map `c'"
 		foreach s of local sexes {
@@ -88,6 +91,7 @@ Purpose:	Download the current GBD database and save it into csv files for offlin
 	levels risk, l(risks) c
 
 // output risks
+	capture mkdir "$tmp_dir/treemap_risks"
 	foreach g of local geo_sexes {
 		display "risk `g'"
 		foreach r of local risks {
