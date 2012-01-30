@@ -29,3 +29,7 @@
 	text-shadow: none;
 	font-size: 12px;
 }
+
+.treemap_cell {
+	cursor: pointer;
+}

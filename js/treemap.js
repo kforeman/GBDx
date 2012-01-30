@@ -5,12 +5,12 @@
 
 // treemap colors
 	var treemap_color_list = {
-			D: colorbrewer['Reds'][9].splice(2,7),
-			E: colorbrewer['Blues'][9].splice(2,7),
-			F: colorbrewer['Greens'][9].splice(2,7) 
+			A: colorbrewer['Reds'][9].splice(2,7),
+			B: colorbrewer['Blues'][9].splice(2,7),
+			C: colorbrewer['Greens'][9].splice(2,7) 
 		};
 		treemap_interps = {};
-	['D', 'E', 'F'].map(function(c) {	
+	['A', 'B', 'C'].map(function(c) {	
 		treemap_interps[c] = [];
 		for (i=0; i<6; i++) {
 			treemap_interps[c].push(d3.interpolate(treemap_color_list[c][i], treemap_color_list[c][i+1]));
@@ -42,19 +42,15 @@
 			return rf == 'b' ? treemap_color_list[d.cause_viz.substr(0,1)][1] : treemap_color_list[d.cause_viz.substr(0,1)][5];
 		}
 		else if (scale == 'change') {
-			var datum = retrieve_datum(settings['geo_' + c], d.cause_viz, settings['sex_' + c]);
-			if (typeof datum != 'undefined') {
-				var val2005 = retrieve_value(datum, settings['metric_' + c], 'm', settings['age_' + c], lookups['reverse_year']['2005'], 'rate', settings['geo_' + c], settings['sex_' + c]),
-					val2010 = retrieve_value(datum, settings['metric_' + c], 'm', settings['age_' + c], lookups['reverse_year']['2010'], 'rate', settings['geo_' + c], settings['sex_' + c]),
+			if (d.cause_viz.length == 3) return '#444';
+			else {
+				var val2005 = retrieve_value(settings['metric_' + c], settings['age_' + c], lookups['reverse_year']['2005'], 'rate', settings['geo_' + c], settings['sex_' + c], d.cause_viz),
+					val2010 = retrieve_value(settings['metric_' + c], settings['age_' + c], lookups['reverse_year']['2010'], 'rate', settings['geo_' + c], settings['sex_' + c], d.cause_viz),
 					chg = Math.log(val2010 / val2005) / (2010-2005);
 				var v = treemap_change_scale(chg);
 				if (isNaN(chg)) return '#444';
 				else return treemap_interps[d.cause_viz.substr(0,1)][Math.floor(v)](v - Math.floor(v));				
 			}
-			else {
-				return '#444';
-			}
-
 		}
 	}
 
@@ -95,7 +91,7 @@
 	}
 
 // keep a list of which treemap data has been loaded
-	loaded_treemap_data = {};
+	appended_treemap_data = {};
 
 // generate default treemap layout
 	treemap_layout_A = d3.layout.treemap()
@@ -103,13 +99,13 @@
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
-			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'D' ? 1 : -1) : a.value - b.value; });
+			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'A' ? 1 : -1) : a.value - b.value; });
 	treemap_layout_B = d3.layout.treemap()
 			.size([content_width * .8, height * .5 - 10])
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
-			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'D' ? 1 : -1) : a.value - b.value; });
+			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'A' ? 1 : -1) : a.value - b.value; });
 
 // set the size of treemap labels
 	min_treemap_label = .01;
@@ -166,7 +162,7 @@
 		  	//	return (d.depth == (settings['tree_depth_' + c] + (settings['tree_depth_' + c] >= 2 ? 1 : 0))) || (d.children == null && d.depth <= (settings['tree_depth_' + c] + (settings['tree_depth_' + c] >= 2 ? 1 : 0))) ? 'visible' : 'hidden'
 		  	//})
 			.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
-			.attr('class', function(d) { return 'treemap_' + c + '_' + d.depth + ' treemap_' + c + '_cell'; })
+			.attr('class', function(d) { return 'treemap_' + c + '_' + d.depth + ' treemap_' + c + '_cell treemap_cell'; })
 			.attr('title', function(d) { return lookups['cause'][d.cause_viz] ? lookups['cause'][d.cause_viz].cause_name : '' });
 	
 	
@@ -186,7 +182,7 @@
 	
 	// rectangle overlays for risks
 		tree_rfs[c]= tree_cells[c].append('rect')
-			.attr('width', function(d) { return d3.max([0, d.dx * retrieve_rf(settings['geo_' + c], d.cause_viz, settings['sex_' + c], settings['tree_risk_' + c], settings['metric_' + c], settings['age_' + c], settings['year_' + c])]); })
+			.attr('width', function(d) { return d3.max([0, d.dx * retrieve_treemap_rf(settings['geo_' + c], d.cause_viz, settings['sex_' + c], settings['tree_risk_' + c], settings['metric_' + c], settings['age_' + c], settings['year_' + c])]); })
 			.attr('x', function(d) { switch(d.depth) {
 				case 0: 	return 0; 	break;
 				case 1: 	return 3; 	break;
@@ -287,7 +283,7 @@
 			.style('font-size', '14px');
 		var m = l.append('g')
 			.attr('transform', 'translate(-32,20)');
-		['D', 'E', 'F'].map(function(d, i) {
+		['A', 'B', 'C'].map(function(d, i) {
 			d3.range(100).reverse().map(function(j) {
 				m.append('rect')
 					.attr('width', 28)
@@ -327,7 +323,7 @@
 			.style('font-size', '12px');
 		var m = l.append('g')
 			.attr('transform', 'translate(-32,20)');
-		['D', 'E', 'F'].map(function(d, i) {
+		['A', 'B', 'C'].map(function(d, i) {
 			d3.range(100).reverse().map(function(j) {
 				m.append('rect')
 					.attr('width', 28)
@@ -347,9 +343,9 @@
 
 	// group legend
 		var l = d3.select('#tree_legend_' + c + '_group');
-		[{ val: 'D', name: 'Group I' },
-		{ val: 'E', name: 'Group II' },
-		{ val: 'F', name: 'Group III' }].map(function(d, i) {
+		[{ val: 'A', name: 'Group I' },
+		{ val: 'B', name: 'Group II' },
+		{ val: 'C', name: 'Group III' }].map(function(d, i) {
 			var m = l.append('g')
 					.attr('transform', 'translate(-50,' + (i*50 + 50) + ')');
 			m.append('rect')	
@@ -414,7 +410,7 @@
 				 	return d.risk == settings['tree_risk_' + c]; 
 				 })[0].risk_short);
 		
-		['D', 'E', 'F'].map(function(d, i) {
+		['A', 'B', 'C'].map(function(d, i) {
 			l.append('rect')
 				.attr('x', i*35 - 48)
 				.attr('y', 45)
@@ -492,22 +488,22 @@
 		if (chart == 'treemap') {
 			
 		// attach the data to the treemap structure if it hasn't been already
-			if (loaded_treemap_data[geo + '_' + sex + '_' + c] != 1) {
-				add_treemap_data(geo, sex, c);
+			if (appended_treemap_data[geo + '_' + sex + '_' + c + '_' + metric] != 1) {
+				add_treemap_data(geo, sex, metric, c);
 			}
 			
 		// update the data
 			if (c == 'A') {
 				treemap_layout_A.nodes(treemap_data_A);
 				treemap_layout_A.value(function(d) {
-					return d[settings['geo_A'] + '_' + settings['sex_A']] ? parseFloat(d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A'] + '_m_' + settings['age_A'] + '_' + settings['year_A']]) : 0;
+					return d[settings['geo_A'] + '_' + settings['sex_A']] ? (d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']] ? parseFloat(d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']]['m' + settings['age_A'] + '_' + settings['year_A']]) : 0) : 0;
 				});
 				tree_cells['A'].data(treemap_layout_A);	
 			}
 			else if (c == 'B') {
 				treemap_layout_B.nodes(treemap_data_B);
 				treemap_layout_B.value(function(d) {
-					return d[settings['geo_B'] + '_' + settings['sex_B']] ? parseFloat(d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B'] + '_m_' + settings['age_B'] + '_' + settings['year_B']]) : 0;
+					return d[settings['geo_B'] + '_' + settings['sex_B']] ? (d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']] ? parseFloat(d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']]['m' + settings['age_B'] + '_' + settings['year_B']]) : 0) : 0;
 				});
 				tree_cells['B'].data(treemap_layout_B);	
 			}
@@ -552,7 +548,7 @@
 					case 3: 	return 1; 	break;
 					default: 	return 1; 	break;
 				}})
-				.attr('width', function(d) { return d3.max([0, d.dx * retrieve_rf(settings['geo_' + c], d.cause_viz, settings['sex_' + c], settings['tree_risk_' + c], settings['metric_' + c], settings['age_' + c], settings['year_' + c])]); })
+				.attr('width', function(d) { return d3.max([0, d.dx * retrieve_treemap_rf(settings['geo_' + c], d.cause_viz, settings['sex_' + c], settings['tree_risk_' + c], settings['metric_' + c], settings['age_' + c], settings['year_' + c])]); })
 				.attr('height', function(d) { switch(d.depth) {
 					case 0: 	return d3.max([0,d.dy-0]); 	break;
 					case 1: 	return d3.max([0,d.dy-3*2]); 	break;
@@ -601,10 +597,10 @@
 	}
 
 // insert new data into the correct leaves of the tree object
-	function add_treemap_data(geo, sex, c) {
+	function add_treemap_data(geo, sex, metric, c) {
 		
 		// grab the input data
-		var new_data = retrieve_data_by_geo_sex(geo, sex);
+		var new_data = retrieve_treemap_data(geo, sex, metric);
 		
 		// extract the leaves for this geo/sex
 		var new_leaves = [];
@@ -613,20 +609,20 @@
 		});
 		
 		// append the new data as leaves to the tree
-		new_leaves.map(append_leaf, { geo: geo, sex: sex, c: c });
+		new_leaves.map(append_leaf, { geo: geo, sex: sex, c: c, metric: metric });
 		
 		// mark the data as loaded
-		loaded_treemap_data[geo + '_' + sex + '_' + c] = 1;
+		appended_treemap_data[geo + '_' + sex + '_' + c + '_' + metric] = 1;
 	}
 
-		
 				
 // this fellow recursively adds the data for selected geo, age, sex, year to the existing tree
 		function append_leaf(leaf) {
 			var cause_index = tree_indices[leaf.cause_viz],
-				d = 'treemap_data_' + this['c'];
-			if (typeof cause_index != 'undefined') cause_index.map(function(i) { d = d + '["children"][' + i + ']'; });
-			eval(d + '["' + this['geo'] + '_' + this['sex'] + '"] = leaf;');
+				dd = 'treemap_data_' + this['c'];
+			if (typeof cause_index != 'undefined') cause_index.map(function(i) { dd = dd + '["children"][' + i + ']'; });
+			eval('if (typeof ' + dd + '["' + this['geo'] + '_' + this['sex'] + '"] == "undefined") ' + dd + '["' + this['geo'] + '_' + this['sex'] + '"]  = {};');
+			eval(dd + '["' + this['geo'] + '_' + this['sex'] + '"]["' + this['metric'] + '"] = leaf;');
 		}
 
 

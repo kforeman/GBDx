@@ -26,10 +26,10 @@
 	  	.text('GBD 2010');
 	 
 // loading gif
-	//loading_indicator = body.append('div')
-	//	.attr('id', 'loading_indicator');
-	//loading_indicator.append('img')
-	//	.attr('src', 'resources/loading.gif');
+//	loading_indicator = body.append('div')
+//		.attr('id', 'loading_indicator');
+//	loading_indicator.append('img')
+//		.attr('src', 'resources/loading.gif');
 
 // add the righthand content section
 	content = body.append('div')

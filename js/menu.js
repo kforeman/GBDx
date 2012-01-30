@@ -193,41 +193,54 @@
 	update_functions['cause'] = change_cause;
 
 // load in list of years
-	$.ajax({
-		url: 'php/year_list.php',
-		dataType: 'json',
-		async: false,
-		success: function(json) {
-		// save year list
-			year_list = json;
-		// create year lookup
-			lookups['year'] = {};
-			lookups['reverse_year'] = {};
-			year_list.map(function(y) {
-				lookups['year'][y.year_viz] = y.year_name;
-				lookups['reverse_year'][y.year_name] = parseInt(y.year_viz);
-			});
-		// add year sliders
-			menu_control_list.map(function(e) {
-				var s = d3.select('#menu_control_year_' + e.val);
-				s.append('div')
-					.attr('id', 'year_slider_' + e.val);
-				$('#year_slider_' + e.val).slider({
-					min: d3.min(year_list, function(d) { return parseInt(d.year_viz); }),
-					max: d3.max(year_list, function(d) { return parseInt(d.year_viz); }),
-					animate: true,
-					value: settings['year_' + e.val],
-					slide: function(event, ui) {
-						change_year(e.val, ui.value);
-					}
-				});
-				s.append('div')
-				  	.attr('class', 'slider_label')
-				  .append('center')
-					.attr('id', 'year_label_' + e.val)
-					.text(lookups['year'][settings['year_' + e.val]]);
-			});
-	}});
+	if (use_mysql) {
+		$.ajax({
+			url: 'php/year_list.php',
+			dataType: 'json',
+			async: false,
+			success: function(json) {
+			// save year list
+				year_list = json;
+			}
+		});
+	}
+	else {
+		$.ajax({
+			url: 'data/parameters/year_list.csv',
+			dataType: 'text',
+			async: false,
+			success: function(csv) {
+				year_list = d3.csv.parse(csv);
+			}
+		});	
+	}
+// create year lookup
+	lookups['year'] = {};
+	lookups['reverse_year'] = {};
+	year_list.map(function(y) {
+		lookups['year'][y.year_viz] = y.year_name;
+		lookups['reverse_year'][y.year_name] = parseInt(y.year_viz);
+	});
+// add year sliders
+	menu_control_list.map(function(e) {
+		var s = d3.select('#menu_control_year_' + e.val);
+		s.append('div')
+			.attr('id', 'year_slider_' + e.val);
+		$('#year_slider_' + e.val).slider({
+			min: d3.min(year_list, function(d) { return parseInt(d.year_viz); }),
+			max: d3.max(year_list, function(d) { return parseInt(d.year_viz); }),
+			animate: true,
+			value: settings['year_' + e.val],
+			slide: function(event, ui) {
+				change_year(e.val, ui.value);
+			}
+		});
+		s.append('div')
+		  	.attr('class', 'slider_label')
+		  .append('center')
+			.attr('id', 'year_label_' + e.val)
+			.text(lookups['year'][settings['year_' + e.val]]);
+	});
 
 // update year
 	function change_year(c, val) {
@@ -239,39 +252,54 @@
 	update_functions['year'] = change_year;
 
 // load in list of ages
-	$.ajax({
-		url: 'php/age_list.php',
-		dataType: 'json',
-		async: false,
-		success: function(json) {
-		// save age list
-			age_list = json;
-		// create age lookup
-			lookups['age'] = {};
-			age_list.map(function(a) {
-				lookups['age'][a.age_viz] = a.age_name;
-			});
-		// add age sliders
-			menu_control_list.map(function(e) {
-				var s = d3.select('#menu_control_age_' + e.val);
-				s.append('div')
-					.attr('id', 'age_slider_' + e.val);
-				$('#age_slider_' + e.val).slider({
-					min: d3.min(age_list, function(d) { return parseInt(d.age_viz); }),
-					max: d3.max(age_list, function(d) { return parseInt(d.age_viz); }),
-					animate: true,
-					value: settings['age_' + e.val],
-					slide: function(event, ui) {
-						change_age(e.val, ui.value);
-					}
-				});
-				s.append('div')
-				  	.attr('class', 'slider_label')
-				  .append('center')
-					.attr('id', 'age_label_' + e.val)
-					.text(lookups['age'][settings['age_' + e.val]]);
-			});
-	}});
+	if (use_mysql) {
+		$.ajax({
+			url: 'php/age_list.php',
+			dataType: 'json',
+			async: false,
+			success: function(json) {
+			// save age list
+				age_list = json;
+			}
+		});	
+	}
+	else {
+		$.ajax({
+			url: 'data/parameters/age_list.csv',
+			dataType: 'text',
+			async: false,
+			success: function(csv) {
+				age_list = d3.csv.parse(csv);
+			}
+		});	
+	}
+// create age lookup
+	lookups['age'] = {};
+	lookups['reverse_age'] = {};
+	age_list.map(function(a) {
+		lookups['age'][a.age_viz] = a.age_name;
+		lookups['reverse_age'][a.age_axis] = parseInt(a.age_viz);
+	});
+// add age sliders
+	menu_control_list.map(function(e) {
+		var s = d3.select('#menu_control_age_' + e.val);
+		s.append('div')
+			.attr('id', 'age_slider_' + e.val);
+		$('#age_slider_' + e.val).slider({
+			min: d3.min(age_list, function(d) { return parseInt(d.age_viz); }),
+			max: d3.max(age_list, function(d) { return parseInt(d.age_viz); }),
+			animate: true,
+			value: settings['age_' + e.val],
+			slide: function(event, ui) {
+				change_age(e.val, ui.value);
+			}
+		});
+		s.append('div')
+		  	.attr('class', 'slider_label')
+		  .append('center')
+			.attr('id', 'age_label_' + e.val)
+			.text(lookups['age'][settings['age_' + e.val]]);
+	});
 
 // update age
 	function change_age(c, val) {

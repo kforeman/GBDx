@@ -8,20 +8,15 @@
 	include 'mysql_config.php';
 
 	// connect to the database
-	$pdo = new PDO($dsn, $username, $password);
-	
-	// make an empty array in which to put the data
-	$rows = array();
-	
-	// prepare the query for this geographic unit
-	$stmt = $pdo->prepare('SELECT * FROM gbd_causes ORDER BY cause_sort;');
+	$link = mysql_connect($host, $username, $password);
+	$db = mysql_select_db($db, $link);
 
-	// query the database
-	$stmt->execute(array('default'));
-	
-	// save the mysql results into an array
-	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
+	// perform the query
+	$rows = array();
+	$result = mysql_query('SELECT * FROM gbd_causes ORDER BY cause_sort;');
+	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+    	$rows[] = $row;
+		
 	// return the results in json format
 	if (count($rows)) echo json_encode($rows);
 	else echo '"failure"';

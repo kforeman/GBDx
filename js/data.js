@@ -5,59 +5,80 @@
 
 // object in which to store the data, nested by geo, sex, cause
 	var estimates = {},
-		loaded_data_by_geo_sex = {},
-		loaded_data_by_cause_sex = {},
-		loaded_rfs_by_geo_sex_risk = {},
-		rfs = {};
+		loaded_treemap_data = {},
+		loaded_map_data = {},
+		loaded_treemap_rfs = {},
+		loaded_uncertainty = {},
+		treemap_rfs = {};
 	geo_list.map(function(g) {
 		estimates[g.code] = {};
-		rfs[g.code] = {};
+		treemap_rfs[g.code] = {};
 		['M', 'F'].map(function(s) {
 			estimates[g.code][s] = {};	
-			rfs[g.code][s] = {};
-			risk_list.map(function(r) {
-				rfs[g.code][s][r.risk] = {};
+			treemap_rfs[g.code][s] = {};
+			metric_list.map(function(m) {
+				estimates[g.code][s][m.val] = {};
+				treemap_rfs[g.code][s][m.val] = {};
+				risk_list.map(function(r) {
+					treemap_rfs[g.code][s][m.val][r.risk] = {};
+				});
 			});
 		});
 	});
 
-// function to retrieve estimates for a given geo/sex
-	function retrieve_data_by_geo_sex(geo, sex) {
+// function to retrieve estimates for a given geo/sex/metric
+	function retrieve_treemap_data(geo, sex, metric) {
 		
 		// download the data if it hasn't been already
-			if (loaded_data_by_geo_sex[geo + '_' + sex] != 1) load_data_by_geo_sex(geo, sex);
-			
+			if (loaded_treemap_data[geo + '_' + sex + '_' + metric] != 1) download_treemap_data(geo, sex, metric);
+		
 		// return the requested data
-			return estimates[geo][sex];
+			return estimates[geo][sex][metric];
 	}
 
 // load data by geo/sex (for treemaps)
-	function load_data_by_geo_sex(geo, sex) {
-		//loading_indicator.transition().style('visibility', 'visible');
-		$.ajax({
-			url: 'php/results_by_geo_sex.php?geo_sex=' + geo + '_' + sex,
-			dataType: 'json',
-			async: false,
-			success: function(json) {
-				json.map(function(d) {
-					estimates[geo][sex][d.cause_viz] = d;
-				});
-				loaded_data_by_geo_sex[geo + '_' + sex] = 1;
-			}
-		});
-		//loading_indicator.transition().style('visibility', 'hidden');
+	function download_treemap_data(geo, sex, metric) {
+		// download from mysql if online
+		if (use_mysql) {
+			$.ajax({
+				url: 'php/treemap_data.php?geo_sex=' + geo + '_' + sex + '&metric=' + metric,
+				dataType: 'json',
+				async: false,
+				success: function(json) {
+					json.map(function(d) {
+						estimates[geo][sex][metric][d.cause_viz] = d;
+					});
+					loaded_treemap_data[geo + '_' + sex + '_' + metric] = 1;
+				}
+			});		
+		}
+		// otherwise open the csv
+		else {
+			$.ajax({
+				url: 'data/treemap/' + geo + '_' + sex + '_' + metric + '.csv',
+				dataType: 'text',
+				async: false,
+				success: function(csv) {
+					var data = d3.csv.parse(csv);
+					data.map(function(d) {
+						estimates[geo][sex][metric][d.cause_viz] = d;
+					});
+					loaded_treemap_data[geo + '_' + sex + '_' + metric] = 1;
+				}
+			});	
+		}
 	}
 
-// function to retrieve estimates for a given cause/sex
-	function retrieve_data_by_cause_sex(cause, sex) {
+// function to retrieve estimates for a given cause/sex/metric
+	function retrieve_map_data(cause, sex, metric) {
 		
 		// download the data if it hasn't been already
-			if (loaded_data_by_cause_sex[cause + '_' + sex] != 1) load_data_by_cause_sex(cause, sex);
+			if (loaded_map_data[cause + '_' + sex + '_' + metric] != 1) download_map_data(cause, sex, metric);
 		
 		// make an appropriately shaped result object
 			var results = {};
 			geo_list.map(function(d) {
-				results[d.code] = estimates[d.code][sex][cause];
+				results[d.code] = estimates[d.code][sex][metric][cause];
 			});
 					
 		// return the requested data
@@ -65,95 +86,147 @@
 	}
 
 // load data by cause and sex (for maps)
-	function load_data_by_cause_sex(cause, sex) {
-		//loading_indicator.transition().style('visibility', 'visible');
-		$.ajax({
-			url: 'php/results_by_cause_sex.php?cause_viz=' + cause + '&sex=' + sex,
-			dataType: 'json',
-			async: false,
-			success: function(json) {
-				json.map(function(d) {
-					var gs = d.geo_sex.split('_'),
-						g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
-						s = (gs.length == 2 ? gs[1] : gs[2]);
-					if (estimates[g]) estimates[g][s][cause] = d;
-					loaded_data_by_cause_sex[cause + '_' + sex] = 1;
-				});
-			}
-		});
-		//loading_indicator.transition().style('visibility', 'hidden');
+	function download_map_data(cause, sex, metric) {
+		// download from mysql if we're online
+		if (use_mysql) {
+			$.ajax({
+				url: 'php/map_data.php?cause_viz=' + cause + '&sex=' + sex + '&metric=' + metric,
+				dataType: 'json',
+				async: false,
+				success: function(json) {
+					json.map(function(d) {
+						var gs = d.geo_sex.split('_'),
+							g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
+							s = (gs.length == 2 ? gs[1] : gs[2]);
+						if (estimates[g]) estimates[g][s][metric][cause] = d;
+					});
+					loaded_map_data[cause + '_' + sex + '_' + metric] = 1;
+				}
+			});
+		}
+		// otherwise open the csv
+		else {
+			$.ajax({
+				url: 'data/map/' + cause + '_' + sex + '_' + metric + '.csv',
+				dataType: 'text',
+				async: false,
+				success: function(csv) {
+					var data = d3.csv.parse(csv);
+					data.map(function(d) {
+						var gs = d.geo_sex.split('_'),
+							g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
+							s = (gs.length == 2 ? gs[1] : gs[2]);
+						if (estimates[g]) estimates[g][s][metric][cause] = d;
+					});
+					loaded_map_data[cause + '_' + sex + '_' + metric] = 1;
+				}
+			});	
+		}
 	}
 
 // find rf estimates for a geo/cause/sex/risk
-	function retrieve_rf(geo, cause, sex, risk, metric, age, year) {
+	function retrieve_treemap_rf(geo, cause, sex, risk, metric, age, year) {
 		// just return 1 for total
 			if (risk == 'total') return 1;
 			else {
 		
 			// download if necessary
-				if (loaded_rfs_by_geo_sex_risk[geo + '_' + sex + '_' + risk] != 1) load_rf_by_geo_sex_risk(geo, sex, risk);
+				if (loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] != 1) download_treemap_rf(geo, sex, metric, risk);
 			
 			// return the value
-				return rfs[geo][sex][risk][cause] ? (rfs[geo][sex][risk][cause][metric + '_' + age + '_' + year] ? parseFloat(rfs[geo][sex][risk][cause][metric + '_' + age + '_' + year]) : 0) : 0;
+				return treemap_rfs[geo][sex][metric][risk][cause] ? (rfs[geo][sex][metric][risk][cause][metric + '_' + age + '_' + year] ? parseFloat(rfs[geo][sex][metric][risk][cause][metric + '_' + age + '_' + year]) : 0) : 0;
 			}
 	}
 
-// load risk proportions for a given geo/sex/risk (for treemaps with risks)
-	function load_rf_by_geo_sex_risk(geo, sex, risk) {
+// load risk proportions for a given geo/sex/metric/risk (for treemaps with risks)
+	function download_treemap_rf(geo, sex, metric, risk) {
+		if (use_mysql) {
+			$.ajax({
+				url: 'php/treemap_rfs.php?geo_sex=' + geo + '_' + sex + '&risk=' + risk,
+				dataType: 'json',
+				async: false,
+				success: function(json) {
+					json.map(function(d) {
+						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
+					});
+					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+				}
+			});		
+		}
+		else {
+			$.ajax({
+				url: 'data/treemap_risks/' + geo + '_' + sex + '_' + risk + '.csv',
+				dataType: 'text',
+				async: false,
+				success: function(csv) {
+					var data = d3.csv.parse(csv);
+					data.map(function(d) {
+						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
+					});
+					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+				}
+			});	
+		}
+	}
+
+// return a value in correct units (must already be downloaded)
+	function retrieve_value(metric, age, year, unit, geo, sex, cause) {
+		try {
+			var pop = parseInt(totals[geo][sex]['pop_' + age + '_' + year]),
+				env = parseFloat(totals[geo][sex][metric + '_' + age + '_' + year]),
+				cf = parseFloat(estimates[geo][sex][metric][cause]['m' + age + '_' + year]);
+			switch(unit) {
+				case 'prop':
+					return cf;
+					break;
+				case 'num':
+					return cf * env;
+					break;
+				case 'rate':
+					return cf * env * 100000 / pop;
+					break;
+			}
+		}
+		catch(err) {
+			return NaN;
+		}
+	}
+
+// give value with its uncertainty interval
+	function retrieve_uncertainty(geo, sex, cause, year, age, metric, unit) {
+		if (use_mysql && loaded_uncertainty[geo + '_' + sex + '_' + metric + '_' + cause] != 1) download_uncertainty(geo, sex, cause, metric);
+		try {
+			var pop = parseInt(totals[geo][sex]['pop_' + age + '_' + year]),
+				env = parseFloat(totals[geo][sex][metric + '_' + age + '_' + year]),
+				m = retrieve_value(metric, age, year, unit, geo, sex, cause),
+				l = parseFloat(estimates[geo][sex][metric][cause]['l' + age + '_' + year]),
+				u = parseFloat(estimates[geo][sex][metric][cause]['u' + age + '_' + year]);
+			switch(unit) {
+				case 'prop':
+					return [m, l, u];
+					break;
+				case 'num':
+					return [m, l*env, u*env];
+					break;
+				case 'rate':
+					return [m, l*env*100000/pop, u*env*100000/pop];
+					break;
+			}
+		}
+		catch(err) {
+			return [NaN, NaN, NaN];
+		}
+	}
+
+// download confidence intervals
+	function download_uncertainty(geo, sex, cause, metric) {
 		$.ajax({
-			url: 'php/rfs_by_geo_sex_risk.php?geo_sex=' + geo + '_' + sex + '&risk=' + risk,
+			url: 'php/uncertainty.php?geo_sex=' + geo + '_' + sex + '&cause=' + cause + '&metric=' + metric,
 			dataType: 'json',
 			async: false,
 			success: function(json) {
-				json.map(function(d) {
-					rfs[geo][sex][risk][d.cause_viz] = d;
-				});
-				loaded_rfs_by_geo_sex_risk[geo + '_' + sex + '_' + risk] = 1;
+				$.extend(estimates[geo][sex][metric][cause], json[0]);
+				loaded_uncertainty[geo + '_' + sex + '_' + metric + '_' + cause] = 1;
 			}
-		});
+		})
 	}
-
-// get data for just a single cause/sex/geo
-	function retrieve_datum(geo, cause, sex) {
-		if (loaded_data_by_cause_sex[cause + '_' + sex] != 1 && loaded_data_by_geo_sex[geo + '_' + sex] != 1) {
-			load_data_by_cause_sex(cause, sex);
-		}
-		return estimates[geo][sex][cause];
-	}
-
-// return a value in correct units when given a row
-	function retrieve_value(d, metric, b, age, year, unit, geo, sex) {
-		var pop = parseInt(totals[geo][sex]['pop_' + age + '_' + year]),
-			env = parseFloat(totals[geo][sex][metric + '_' + age + '_' + year]),
-			cf = parseFloat(d[metric + '_' + b + '_' + age + '_' + year]);
-		switch(unit) {
-			case 'prop':
-				return cf;
-				break;
-			case 'num':
-				return cf * env;
-				break;
-			case 'rate':
-				return cf * env * 100000 / pop;
-				break;
-		}
-	}
-
-// go ahead and load in totals (envelopes/pop)
-	var totals = {};
-	geo_list.map(function(g) {
-		totals[g.code] = {};
-	});
-	$.ajax({
-		url: 'php/totals.php',
-		dataType: 'json',
-		async: false,
-		success: function(json) {
-			json.map(function(d) {
-				var gs = d.geo_sex.split('_'),
-					g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
-					s = (gs.length == 2 ? gs[1] : gs[2]);
-				if (totals[g]) totals[g][s] = d;
-			});
-		}
-	});

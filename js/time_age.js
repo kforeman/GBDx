@@ -196,24 +196,31 @@
 	// update the plot if it's displayed
 		if (chart == 'time_age') {
 			
-		// load in the datum
-			var datum = retrieve_datum(geo, cause, sex);
+		// load in the data if it hasn't been already
+			if (settings['chart_A'] == 'map' || settings['chart_B'] == 'map') retrieve_map_data(cause, sex, metric);
+			else retrieve_treemap_data(geo, sex, metric);
+		
+		// make arrays of the data
+			var time_age_data = {};
+			age_list.map(function(a) {
+				year_list.map(function(y) {
+					time_age_data[a.age_viz + '_' + y.year_viz] = retrieve_uncertainty(geo, sex, cause, y.year_viz, a.age_viz, metric, unit);
+				});
+			});
 		
 		// find max value for age plot
 			var age_vals = [];
 			ages_for_axis.map(function(a) {
-				age_vals.push(retrieve_value(datum, metric, 'u', ordinal_to_ages[a], year, unit, geo, sex));
+				age_vals.push(time_age_data[lookups['reverse_age'][a] + '_' + year][2]);
 			});
 			var age_y_max = d3.max(age_vals);
 		
 		// find max value for year plot
 			var year_vals = [];
 			years_for_axis.map(function(y) {
-				year_vals.push(retrieve_value(datum, metric, 'u', age, ordinal_to_years[y], unit, geo, sex));
+				year_vals.push(time_age_data[age + '_' + lookups['reverse_year'][y]][2]);
 			});
 			var year_y_max = d3.max(year_vals);
-			console.log(year_vals)
-			console.log(year_y_max)
 		
 		// update the scales
 			age_y_scales[c].domain([0, age_y_max]);
@@ -231,27 +238,27 @@
 		// update the age plot
 			age_points[c].transition().duration(1000)
 				.attr('cy', function(a) {
-					return age_y_scales[c](retrieve_value(datum, metric, 'm', ordinal_to_ages[a], year, unit, geo, sex));
+					return age_y_scales[c](time_age_data[lookups['reverse_age'][a] + '_' + year][0]);
 				});
 			age_lines[c].transition().duration(1000)
 				.attr('y1', function(a) {
-					return age_y_scales[c](retrieve_value(datum, metric, 'l', ordinal_to_ages[a], year, unit, geo, sex));
+					return age_y_scales[c](time_age_data[lookups['reverse_age'][a] + '_' + year][1]);
 				})
 				.attr('y2', function(a) {
-					return age_y_scales[c](retrieve_value(datum, metric, 'u', ordinal_to_ages[a], year, unit, geo, sex));
+					return age_y_scales[c](time_age_data[lookups['reverse_age'][a] + '_' + year][2]);
 				});
 		
 		// update the time plot
 			year_points[c].transition().duration(1000)
 				.attr('cy', function(y) {
-					return year_y_scales[c](retrieve_value(datum, metric, 'm', age, ordinal_to_years[y], unit, geo, sex));
+					return year_y_scales[c](time_age_data[age + '_' + lookups['reverse_year'][y]][0]);
 				});
 			year_lines[c].transition().duration(1000)
 				.attr('y1', function(y) {
-					return year_y_scales[c](retrieve_value(datum, metric, 'l', age, ordinal_to_years[y], unit, geo, sex));
+					return year_y_scales[c](time_age_data[age + '_' + lookups['reverse_year'][y]][1]);
 				})
 				.attr('y2', function(y) {
-					return year_y_scales[c](retrieve_value(datum, metric, 'u', age, ordinal_to_years[y], unit, geo, sex));
+					return year_y_scales[c](time_age_data[age + '_' + lookups['reverse_year'][y]][2]);
 				});
 			
 		}

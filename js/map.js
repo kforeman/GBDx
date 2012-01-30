@@ -113,14 +113,14 @@
 		if (chart == 'map') {
 	
 		// load in the data for this cause/sex
-			var map_data = retrieve_data_by_cause_sex(cause, sex);
+			retrieve_map_data(cause, sex, metric);
 		
 		// find the scale
 			var map_vals = [];
 			geo_list.map(function(g) {
 				if (g.code != 'G') {
 					year_list.map(function(y) {
-						if (typeof map_data[g.code] != 'undefined') map_vals.push(retrieve_value(map_data[g.code], metric, 'm', age, y.year_viz, unit, g.code, sex));
+						map_vals.push(retrieve_value(metric, age, y.year_viz, unit, g.code, sex, cause));
 					});
 				}
 			});
@@ -139,8 +139,9 @@
 			map_paths[c].transition()
 				.duration(1000)
 				.style('fill', function(d) {
-					if (typeof map_data[d.id] == 'undefined') return '#ccc';
-					else return choropleth_color(map_color_scales[c](retrieve_value(map_data[d.id], metric, 'm', age, year, unit, d.id, sex)));	
+					var val = retrieve_value(metric, age, year, unit, d.id, sex, cause);
+					if (isNaN(val)) return '#ccc';
+					else return choropleth_color(map_color_scales[c](val));	
 				});
 		}
 	}

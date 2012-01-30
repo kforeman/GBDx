@@ -19,29 +19,32 @@
 			{ val: 'tree_risk',	label: 'Risk',		type: 'select',	section: 'tree' }
 		];
 
+// determine if this is the offline version
+	var use_mysql = (window.location.host != 'localhost:8888');
+
 // create some default settings
 	var defaults = {
-		chart_sync: 	1,
+		chart_sync:		0,
 		chart_A:		'treemap',
-		geo_sync: 		0,
-		geo_A:			'CHN',
-		geo_B:			'IND',
-		cause_sync: 	1,
-		cause_A:		'D',
-		risk_sync: 		1,
-		year_sync: 		1,
+		chart_B:		'map',
+		geo_sync:		1,
+		geo_A:			'G',
+		cause_sync:		1,
+		cause_A:		'A',
+		risk_sync:		1,
+		year_sync:		1,
 		year_A:			3,
-		age_sync: 		1,
+		age_sync:		1,
 		age_A:			22,
 		sex_sync:		1,
 		sex_A:			'M',
 		metric_sync:	1,
-		metric_A:		'dth',
+		metric_A:		'daly',
 		unit_sync:		1,
 		unit_A:			'rate',
 		tree_depth_A:	2,
 		tree_depth_sync:1,
-		tree_color_A:	'group',
+		tree_color_A:	'change',
 		tree_color_sync:1,
 		tree_risk_A:	'alcohol_eg',
 		tree_risk_sync:	1

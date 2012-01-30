@@ -1,6 +1,7 @@
 .map_path {
 	stroke: #fff;
 	stroke-width: 1px;
+	cursor: pointer;
 }
 
 .axis {

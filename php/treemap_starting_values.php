@@ -8,20 +8,15 @@
 	include 'mysql_config.php';
 
 	// connect to the database
-	$pdo = new PDO($dsn, $username, $password);
-	
-	// make an empty array in which to put the data
-	$rows = array();
-	
-	// prepare the query
-	$stmt = $pdo->prepare('SELECT cause_viz, AVG(daly_m_22_3) AS treemap_start_val FROM gbd_cfs WHERE geo_sex="G_M" OR geo_sex="G_F" GROUP BY (cause_viz);');
+	$link = mysql_connect($host, $username, $password);
+	$db = mysql_select_db($db, $link);
 
-	// query the database
-	$stmt->execute(array('default'));
-	
-	// save the mysql results into an array
-	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
+	// perform the query
+	$rows = array();
+	$result = mysql_query('SELECT cause_viz, AVG(daly_m_22_3) AS treemap_start_val FROM gbd_cfs WHERE geo_sex="G_M" OR geo_sex="G_F" GROUP BY (cause_viz);');
+	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+    	$rows[] = $row;
+		
 	// return the results in json format
 	if (count($rows)) echo json_encode($rows);
 	else echo '"failure"';
