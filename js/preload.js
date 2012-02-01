@@ -43,8 +43,15 @@
 			dataType: 'json',
 			async: false,
 			success: function(data) { 
-				treemap_start_A = Object.create(data);
-				treemap_start_B = Object.create(data);
+				treemap_start_A = data;
+			}
+		});
+		$.ajax({
+			url: 'php/treemap_starting_values.php',
+			dataType: 'json',
+			async: false,
+			success: function(data) { 
+				treemap_start_B = data;
 			}
 		});
 	}
@@ -55,8 +62,16 @@
 			async: false,
 			success: function(csv) {
 				data = d3.csv.parse(csv);
-				treemap_start_A = Object.create(data);
-				treemap_start_B = Object.create(data);
+				treemap_start_A = data;
+			}
+		});
+		$.ajax({
+			url: 'data/treemap/treemap_starting_values.csv',
+			dataType: 'text',
+			async: false,
+			success: function(csv) {
+				data = d3.csv.parse(csv);
+				treemap_start_B = data;
 			}
 		});
 	}
