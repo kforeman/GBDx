@@ -13,7 +13,7 @@
 	font-size: 18px !important;
 	padding-left: .9em !important;
 }
-.ui-state-active, .ui-state-active a, .ui-state-hover a, .ui-state-hover span, .menu_label:hover  {
+.ui-state-active, .ui-state-active a, .ui-state-hover a, .ui-state-hover span, .menu_label:hover, .bug_report:hover {
 	color: #ef3b2c !important;
 }
 
@@ -43,6 +43,14 @@
 }
 #title {
 	z-index: 2;
+}
+
+.bug_report {
+	font-weight: bold;
+	color: #555;
+	cursor: pointer;
+	font-size: 14px;
+	text-decoration: none;
 }
 
 .ui-slider {
