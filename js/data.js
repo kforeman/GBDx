@@ -146,10 +146,13 @@
 				dataType: 'json',
 				async: false,
 				success: function(json) {
-					json.map(function(d) {
-						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
-					});
-					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+					if (json == "failure") loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+					else {
+						json.map(function(d) {
+							treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
+						});
+						loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;					
+					}
 				},
 				error: function() {
 					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
