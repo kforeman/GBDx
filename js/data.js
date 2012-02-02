@@ -150,6 +150,9 @@
 						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
 					});
 					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+				},
+				error: function() {
+					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
 				}
 			});		
 		}
@@ -163,6 +166,9 @@
 					data.map(function(d) {
 						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
 					});
+					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+				},
+				error: function() {
 					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
 				}
 			});	
