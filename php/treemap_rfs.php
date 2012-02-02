@@ -22,7 +22,7 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT geo_sex,'.$columns.' FROM gbd_rfs WHERE geo_sex="'.$_GET['geo_sex'].'" AND risk="'.$_GET['risk'].'";');
+	$result = mysql_query('SELECT cause_viz,geo_sex,'.$columns.' FROM gbd_rfs WHERE geo_sex="'.$_GET['geo_sex'].'" AND risk="'.$_GET['risk'].'";');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
     

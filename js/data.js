@@ -134,7 +134,7 @@
 				if (loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] != 1) download_treemap_rf(geo, sex, metric, risk);
 			
 			// return the value
-				return treemap_rfs[geo][sex][metric][risk][cause] ? (rfs[geo][sex][metric][risk][cause][metric + '_' + age + '_' + year] ? parseFloat(rfs[geo][sex][metric][risk][cause][metric + '_' + age + '_' + year]) : 0) : 0;
+				return treemap_rfs[geo][sex][metric][risk][cause] ? (treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year] ? parseFloat(treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year]) : 0) : 0;
 			}
 	}
 
@@ -142,7 +142,7 @@
 	function download_treemap_rf(geo, sex, metric, risk) {
 		if (use_mysql) {
 			$.ajax({
-				url: 'php/treemap_rfs.php?geo_sex=' + geo + '_' + sex + '&risk=' + risk,
+				url: 'php/treemap_rfs.php?geo_sex=' + geo + '_' + sex + '&risk=' + risk + '&metric=' + metric,
 				dataType: 'json',
 				async: false,
 				success: function(json) {
@@ -158,7 +158,7 @@
 		}
 		else {
 			$.ajax({
-				url: 'data/treemap_risks/' + geo + '_' + sex + '_' + risk + '.csv',
+				url: 'data/treemap_risks/' + geo + '_' + sex + '_' + risk + '_' + metric + '.csv',
 				dataType: 'text',
 				async: false,
 				success: function(csv) {
