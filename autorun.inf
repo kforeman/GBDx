@@ -1,0 +1,4 @@
+[autorun]
+open=gbdx\GBDx_app.bat
+label=GBDx Offline
+
