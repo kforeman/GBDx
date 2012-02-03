@@ -84,7 +84,7 @@
 			async: false,
 			success: function(data) {
 				risk_list = data;
-				risk_list.splice(0, 0, { risk: 'total', risk_name: 'Total' });
+				// risk_list.splice(0, 0, { risk: 'total', risk_name: 'Total' });
 			}
 		});	
 	}

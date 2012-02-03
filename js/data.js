@@ -126,16 +126,11 @@
 
 // find rf estimates for a geo/cause/sex/risk
 	function retrieve_treemap_rf(geo, cause, sex, risk, metric, age, year) {
-		// just return 1 for total
-			if (risk == 'total') return 1;
-			else {
+		// download if necessary
+			if (loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] != 1) download_treemap_rf(geo, sex, metric, risk);
 		
-			// download if necessary
-				if (loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] != 1) download_treemap_rf(geo, sex, metric, risk);
-			
-			// return the value
-				return treemap_rfs[geo][sex][metric][risk][cause] ? (treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year] ? parseFloat(treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year]) : 0) : 0;
-			}
+		// return the value
+			return treemap_rfs[geo][sex][metric][risk][cause] ? (treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year] ? parseFloat(treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year]) : 0) : 0;
 	}
 
 // load risk proportions for a given geo/sex/metric/risk (for treemaps with risks)
