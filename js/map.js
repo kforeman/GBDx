@@ -53,20 +53,20 @@
 	
 	// draw a legend
 		g.append('g')
-			.attr('transform', 'translate(300, 330)')
+			.attr('transform', 'translate(250, 330)')
  		  .selectAll('.color_bar')
-			.data(d3.range(200))
+			.data(d3.range(300))
 		  .enter().append('rect')
 			.attr('x', function(d) { return d + 'px'; })
 			.attr('width', '1px')
 			.attr('height', '12px')
 			.attr('y', '0px')
-			.attr('fill', function(d) { return choropleth_color((199-d)/20); })
+			.attr('fill', function(d) { return choropleth_color((299-d)/30); })
 			.attr('stroke', 'none');
 	
 	// label the legend
-		map_legend_scales[c] = d3.scale.linear().range([300, 500]);
-		map_legend_axes[c] = d3.svg.axis().scale(map_legend_scales[c]).ticks(5).orient('bottom').tickSize(5);
+		map_legend_scales[c] = d3.scale.linear().range([250, 550]);
+		map_legend_axes[c] = d3.svg.axis().scale(map_legend_scales[c]).ticks(4).orient('bottom').tickSize(5);
 		map_legend_labels[c] = g.append('g')
 			.attr('transform', 'translate(0, 345)')
 			.attr('class', 'map axis')
