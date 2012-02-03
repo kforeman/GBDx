@@ -254,7 +254,7 @@
   color: #fff;
 }
 .chzn-container .chzn-results li em {
-  background: #feffde;
+  background: none;
   font-style: normal;
 }
 .chzn-container .chzn-results .highlighted em {
