@@ -218,7 +218,7 @@
 			}
 		}
 		catch(err) {
-			return [NaN, NaN, NaN];
+			return [0, 0, 0];
 		}
 	}
 
