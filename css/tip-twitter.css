@@ -9,6 +9,7 @@
 	max-width:200px;
 	color:#fff;
 	background-color:#000;
+	pointer-events: none;
 	/**
 	 * - If you set a background-image, border/padding/background-color will be ingnored.
 	 *   You can set any padding to .tip-inner instead if you need.
