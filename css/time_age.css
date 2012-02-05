@@ -30,3 +30,9 @@
 	text-shadow: none;
 	font-size: 12px;
 }
+
+.ta_point {
+	stroke: #000;
+	fill: #555;
+	cursor: pointer;
+}

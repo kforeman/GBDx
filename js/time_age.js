@@ -45,6 +45,25 @@
 		year_points = {},
 		year_lines = {};
 
+// functions to change settings when clicking on the plot
+	function change_age_ta(new_age) {
+		if (settings['time_age_click']) {
+			change_age('AB', new_age);
+			update_slider('age', 'A', new_age, true);
+			update_slider('age', 'B', new_age, true);
+			update_slider('age', 'AB', new_age, true);
+		}
+	}
+	function change_time_ta(new_year) {
+		if (settings['time_age_click']) {
+			change_year('AB', new_year);
+			update_slider('year', 'A', new_year, true);
+			update_slider('year', 'B', new_year, true);
+			update_slider('year', 'AB', new_year, true);			
+		}
+	}
+
+
 // loop through sections A and B
 	AB.map(function(c) {
 		
@@ -145,13 +164,15 @@
 		age_points[c] = ap_plot.selectAll()
 			.data(ages_for_axis)
 		  .enter().append('circle')
+			.attr('class', 'ta_point')
 		  	.attr('cx', function(d) {
 		  		 return age_x_scale(d);
 		  	})
 		  	.attr('cy', 320)
 		  	.attr('r', 3)
-		  	.style('stroke', '#000')
-		  	.style('fill', '#555');
+		  	.attr('onclick', function(d) {
+		  		return 'change_age_ta(' + lookups['reverse_age'][d] + ');'
+		  	});
 	
 	// add time points and lines in the requisite positions
 		tp_plot = tp.append('g').attr('transform', 'translate(50, 0)');
@@ -171,13 +192,15 @@
 		year_points[c] = tp_plot.selectAll()
 			.data(years_for_axis)
 		  .enter().append('circle')
+		  	.attr('class', 'ta_point')
 		  	.attr('cx', function(d) {
 		  		 return year_x_scale(d);
 		  	})
 		  	.attr('cy', 320)
 		  	.attr('r', 3)
-		  	.style('stroke', '#000')
-		  	.style('fill', '#555');
+		  	.attr('onclick', function(d) {
+		  		return 'change_time_ta(' + lookups['reverse_year'][d] + ');'
+		  	});
 	});
 	
 // refresh the plots
@@ -264,10 +287,3 @@
 		}
 		
 	}
-	
-	
-	
-	
-	
-	
-	

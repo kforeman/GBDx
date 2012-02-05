@@ -62,6 +62,7 @@
 // add some additional global settings
 	defaults['tree_click'] = true;
 	defaults['map_click'] = true;
+	defaults['time_age_click'] = true;
 
 // for now just load in the defaults
 	var settings = defaults;

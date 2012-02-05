@@ -680,6 +680,7 @@
 		// if switching to synced mode, match B to A
 			if (settings[m + '_sync']) {
 				update_functions[m]('B', settings[m + '_AB']);
+				update_slider(m, 'B', settings[m + '_AB'], true);
 			}
 	}
 	
