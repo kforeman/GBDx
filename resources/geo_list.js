@@ -5,8 +5,8 @@
 
 geo_list = [
 {name: 'Global', code: 'G'},
-//{name: 'Developing', code: 'D0'},
-//{name: 'Developed', code: 'D1'},
+{name: 'Developing', code: 'D0'},
+{name: 'Developed', code: 'D1'},
 {name: "East Asia/Pacific",code: 'SR_6',SR:6},
 {name: "Asia, East",code: 'R_3',SR:6,R:3},
 {name: "China",code: 'CHN',SR:6,R:3},
