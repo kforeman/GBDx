@@ -15,7 +15,7 @@
 	menu = body.append('div')
 		.attr('id', 'menu')
 		.style('width', menu_width + 'px')
-		.style('height', height + 'px')
+		.style('height', (height + 3) + 'px')
 		.style('background-color', bg);
 
 // title
