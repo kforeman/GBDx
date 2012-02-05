@@ -405,28 +405,26 @@
 	
 	
 // bug report button
-	if (use_mysql) {
-		main_menu.append('div')
-			.style('top', '500px')
-			.style('position', 'absolute')
-			.style('width', '250px')
-		  .append('center')
-			.attr('onclick', 'bug_email()')
-			.attr('class', 'bug_report')
-			.text('Submit Bug Report');
-		function bug_email() {
-			var mailto = "mailto:kfor@uw.edu?subject=GBDx Bug Report&body=Dear Kyle,%0A%0AI have angered the benevolent GBDx gods in the following ways:%0A[Describe the bug you've encountered here]%0A%0A[Insert screenshot here]%0A%0ACurrent settings:%0A" + JSON.stringify(sort_keys(settings), null, '%0A');
-			win = window.open(mailto, 'emailWindow');
-			if (win && win.open &&!win.closed) win.close();
-		}
-		function sort_keys(o) {
-			var sorted = {},
-				key, a = [];
-			for (key in o) if (o.hasOwnProperty(key)) a.push(key);
-			a.sort();
-			for (key = 0; key < a.length; key++) sorted[a[key]] = o[a[key]];
-			return sorted;
-		}
+	main_menu.append('div')
+		.style('top', '500px')
+		.style('position', 'absolute')
+		.style('width', '250px')
+  	  .append('center')
+	  	.attr('onclick', 'bug_email()')
+  		.attr('class', 'bug_report')
+	  	.text('Submit Bug Report');
+	function bug_email() {
+		var mailto = "mailto:kfor@uw.edu?subject=GBDx Bug Report&body=Dear Kyle,%0A%0AI have angered the benevolent GBDx gods in the following ways:%0A[Describe the bug you've encountered here]%0A%0A[Insert screenshot here]%0A%0ACurrent settings:%0A" + JSON.stringify(sort_keys(settings), null, '%0A');
+		win = window.open(mailto, 'emailWindow');
+		if (win && win.open &&!win.closed) win.close();
+	}
+	function sort_keys(o) {
+ 		var sorted = {},
+    		key, a = [];
+	    for (key in o) if (o.hasOwnProperty(key)) a.push(key);
+	    a.sort();
+	    for (key = 0; key < a.length; key++) sorted[a[key]] = o[a[key]];
+    	return sorted;
 	}
 	
 
@@ -557,7 +555,7 @@
 			update_charts(c);
 	}
 	update_functions['tree_risk'] = change_tree_risk;
-	
+
 
 // function to choose the correct value in a select menu
 	function update_select(m, c, val) {
@@ -644,51 +642,3 @@
 			refresh_time_age(c);
 		}
 	}
-
-						/*
-	main_menu_entries.map(function(e) {
-		var r = main_menu.append('tr');
-		// add a button to sync/unsync charts 
-		var d = r.append('td')
-			.attr('rowspan', 2)
-			.style('line-height', menu_row_height + 'px');
-		d.append('input')
-			.attr('type', 'checkbox')
-			.attr('id', 'menu_button_' + e.val);
-		d.append('label')
-			.attr('for', 'menu_button_' + e.val)
-			.text(e.label);
-		$('#menu_button_' + e.val).button();
-		// add divs for each control element
-		r.append('td')
-			.style('line-height', (menu_row_height / 2) + 'px')
-			.attr('id', 'menu_td_' + e.val + '_A')
-		  .append('div')
-			.attr('id', 'menu_control_' + e.val + '_A').append('span').text('A');
-		main_menu.append('tr')
-		  .append('td')
-			.style('line-height', (menu_row_height / 2) + 'px')
-			.attr('id', 'menu_td_' + e.val + '_B')
-		  .append('div')
-			.attr('id', 'menu_control_' + e.val + '_B').append('span').text('B');
-			
-		
-	})
-	
-	function blah(n) {
-		d3.select('#menu_td_' + n + '_A').style('line-height', (menu_row_height + 2) + 'px');
-		d3.select('#menu_td_' + n + '_B').remove();
-	}
-	*/
-	
-	/*r1 = main_menu.append('tr')
-	r1.append('td').attr('rowspan', 2).text('label').style('line-height', '40px')
-	r1.append('td').text('a').style('line-height', '20px')
-	main_menu.append('tr').append('td').text('b').style('line-height', '20px')
-	
-	r1 = main_menu.append('tr')
-	r1.append('td').attr('rowspan', 2).text('biglabel')
-	r1.append('td').text('a')
-	main_menu.append('tr').append('td').text('b')
-*/
-
