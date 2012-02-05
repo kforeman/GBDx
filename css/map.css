@@ -24,3 +24,10 @@
 	text-shadow: none;
 	font-size: 15px;
 }
+
+.map_highlight {
+	stroke: #000;
+	stroke-width: 2px;
+	pointer-events: none;
+	fill: none;
+}

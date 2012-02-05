@@ -8,7 +8,6 @@
 			{ val: 'chart', 	label: 'Chart',		type: 'select',	section: 'main' },
 		 	{ val: 'geo', 		label: 'Place',		type: 'select',	section: 'main' },
 		 	{ val: 'cause',		label: 'Cause',		type: 'select',	section: 'main' },
-			//{ val: 'risk',		label: 'Risk',		type: 'select',	section: 'main' },
 			{ val: 'year',		label: 'Year',		type: 'slider',	section: 'main' },
 			{ val: 'age',		label: 'Age',		type: 'slider',	section: 'main' },
 			{ val: 'sex',		label: 'Sex',		type: 'radio',	section: 'main' },
@@ -16,7 +15,8 @@
 			{ val: 'unit',		label: 'Units',		type: 'radio',	section: 'main' },
 			{ val: 'tree_depth',label: 'Depth',		type: 'slider',	section: 'tree' },
 			{ val: 'tree_color',label: 'Color',		type: 'select',	section: 'tree' },
-			{ val: 'tree_risk',	label: 'Risk',		type: 'select',	section: 'tree' }
+			{ val: 'tree_risk',	label: 'Risk',		type: 'select',	section: 'tree' },
+			{ val: 'map_level',	label: 'Level',		type: 'select',	section: 'map' 	},
 		];
 
 // determine if this is the offline version
@@ -24,30 +24,31 @@
 
 // create some default settings
 	var defaults = {
-		chart_sync:		0,
+		chart_sync:		false,
 		chart_A:		'treemap',
 		chart_B:		'map',
-		geo_sync:		1,
+		geo_sync:		true,
 		geo_A:			'G',
-		cause_sync:		1,
+		cause_sync:		true,
 		cause_A:		'A',
-		risk_sync:		1,
-		year_sync:		1,
+		year_sync:		true,
 		year_A:			3,
-		age_sync:		1,
+		age_sync:		true,
 		age_A:			22,
-		sex_sync:		1,
+		sex_sync:		true,
 		sex_A:			'M',
-		metric_sync:	1,
+		metric_sync:	true,
 		metric_A:		'daly',
-		unit_sync:		1,
+		unit_sync:		true,
 		unit_A:			'rate',
 		tree_depth_A:	2,
-		tree_depth_sync:1,
+		tree_depth_sync:true,
 		tree_color_A:	'change',
-		tree_color_sync:1,
+		tree_color_sync:true,
 		tree_risk_A:	'alcohol_eg',
-		tree_risk_sync:	1
+		tree_risk_sync:	true,
+		map_level_A:	'C',
+		map_level_sync:	true
 	};
 
 // copy the default settings for A into the AB setting; also, make sure A & B are mirrored if synced
@@ -90,7 +91,14 @@
 		{ val: 'size', 		label: 'Proportion' },
 		{ val: 'change',	label: 'Rate of Change' },
 		{ val: 'risk',		label: 'Risk Factor Attribution' }
-	]
+	];
+
+// map levels
+	var map_level_options = [
+		{ val: 'C', 	label: 'Country' },
+		{ val: 'R', 	label: 'Region' },
+		{ val: 'SR', 	label: 'Super Region' }
+	];
 
 // AB looper
 	var AB = ['A', 'B'];

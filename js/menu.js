@@ -24,12 +24,12 @@
 		.attr('class', 'accordion_section');
 
 // add a map menu
-/*	accordion.append('h3')
+	accordion.append('h3')
 	  .append('a')
 		.attr('href', '#')
 		.text('Map Settings');
-	scatter_menu = accordion.append('div');
-*/
+	map_menu = accordion.append('div')
+		.attr('class', 'accordion_section');
 
 // turn it into an accordion
 	$('#accordion').accordion({ fillSpace: true });
@@ -555,6 +555,62 @@
 			update_charts(c);
 	}
 	update_functions['tree_risk'] = change_tree_risk;
+	
+	
+// fill in the map menu
+	menu_entries.filter(function(d) {
+		 return d.section == 'map';
+	}).map(function(e, i) {
+		// a label identifying the menu entry, which toggles sync when clicked
+			map_menu.append('div')
+			  .append('center')
+				.attr('id', 'menu_label_' + e.val)
+				.attr('onclick', 'toggle_sync("' + e.val + '")')
+				.attr('class', 'menu_label')
+				.style('top', ((menu_row_height * (i + .5)) - (menu_font_size / 2) + (i * menu_row_buffer)) + 'px')
+				.style('font-size', menu_font_size + 'px')
+				.style('line-height', menu_font_size + 'px')
+				.style('font-style', settings[e.val + '_sync'] ? 'italic' : 'normal')
+				.style('width', menu_label_width + 'px')
+				.text(e.label);
+		// divs for the controls
+			menu_control_list.map(function(f) {
+				map_menu.append('div')
+					.attr('id', 'menu_control_' + e.val + '_' + f.val)
+					.attr('class', 'menu_control')
+					.style('top', ((menu_row_height * (i + f.offset)) + (i * menu_row_buffer)) + 'px')
+					.style('height', (menu_row_height / 2) + 'px')
+					.style('width', (menu_width - menu_label_width) + 'px')
+					.style('visibility', ((settings[e.val + '_sync'] && f.val == 'AB') || (!settings[e.val + '_sync'] && f.val != 'AB')) ? 'visible' : 'hidden')
+					.style('left', menu_label_width + 'px');
+			});
+	});
+
+// map level selector	
+	menu_control_list.map(function(e) {
+		var s = d3.select('#menu_control_map_level_' + e.val)
+				  .append('select')
+					.attr('id', 'map_level_select_' + e.val)
+					.attr('class', 'map_level_select_menu')
+					.attr('onchange', 'change_map_level("' + e.val + '",this.value)');
+		s.selectAll()
+		  	.data(map_level_options)
+	  	  .enter().append('option')
+	  	  	.attr('id', function(d) { return 'map_level_option_' + e.val + '_' + d.val; })
+	  	  	.attr('value', function(d) { return d.val; })
+	  	  	.text(function(d) { return d.label; });
+	  	$('#map_level_option_' + e.val + '_' + settings['map_level_' + e.val])[0].selected = true;
+	  	$('#map_level_select_' + e.val).chosen({ disable_search_threshold: 10 });
+	});
+
+// update map level
+	function change_map_level(c, val) {
+		// update the settings
+			update_settings('map_level', c, val);
+		// update the charts
+			update_charts(c);
+	}
+	update_functions['map_level'] = change_map_level;
 
 
 // function to choose the correct value in a select menu

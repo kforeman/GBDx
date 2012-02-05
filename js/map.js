@@ -20,7 +20,13 @@
 // make a lookup for country names/regions
 	lookups['geo'] = {};
 	geo_list.map(function(d) {
-		lookups['geo'][d.code] = d;
+		lookups['geo'][d.code] = {
+			'name': 	d.name,
+			'C':		d.code,
+			'R':		'R_' + d.R,
+			'SR':		'SR_' + d.SR,
+			'level':	(d.code.substr(0,2) == 'R_' ? 'R' : (d.code.substr(0,3) == 'SR_' ? 'SR' : 'C'))
+		};
 	})
 
 // generate placeholders for the objects created in the A/B loop
@@ -29,7 +35,8 @@
 		map_legend_axes = {},
 		map_legend_labels = {},
 		map_legend_titles = {},
-		map_color_scales = {};
+		map_color_scales = {},
+		map_highlights = {};
 
 // loop through sections A and B
 	AB.map(function(c) {
@@ -41,15 +48,24 @@
 		  	.attr('transform', 'translate(' + (settings['chart_' + c] == 'map' ? content_buffer : -1 * content_width) + ',' + content_buffer + ')');
 	
 	// draw the map
-		map_paths[c] = g.selectAll()
+		map_paths[c] = g.selectAll('map_paths')
 			.data(geojson_map.features)
 		  .enter().append('path')
 		  	.attr('d', map_coord)
+		  	.attr('onclick', function(d) {
+		  		return 'map_change_geo("' + d.id + '", "' + c + '");';
+		  	})
 		  	.attr('class', 'map_path')
 		  	.style('fill', '#ccc')
 		  	.attr('title', function(d) { return lookups['geo'][d.id] ? lookups['geo'][d.id].name : 'No Data'; });
 	
 	// draw a highlight layer
+		map_highlights[c] = g.selectAll('map_highlights')
+			.data(geojson_map.features)
+		  .enter().append('path')
+		  	.attr('d', map_coord)
+		  	.attr('class', 'map_highlight')
+		  	.style('stroke-opacity', 1e-6);
 	
 	// draw a legend
 		g.append('g')
@@ -83,6 +99,11 @@
 		map_color_scales[c] = d3.scale.linear().range([10-1e-6, 1e-6]).clamp(true);
 	});
 
+// function to change geo when map is clicked
+	function map_change_geo(new_geo, c) {
+		if (settings['map_click'] && typeof lookups['geo'][new_geo] != 'undefined') change_geo('AB', lookups['geo'][new_geo][settings['map_level_' + c]]);
+	}
+
 // add tooltips on mouseover
 	$('.map_path').poshytip({ 
 		slide: false, 
@@ -97,6 +118,7 @@
 	});
 
 // function to update the map
+	var current_map_level = { 'A': '', 'B': '' };
 	function refresh_map(c) {
 	
 	// find the parameters for this map
@@ -107,7 +129,8 @@
 			metric = settings['metric_' + c],
 			unit = settings['unit_' + c],
 			geo = settings['geo_' + c],
-			chart = settings['chart_' + c];
+			chart = settings['chart_' + c],
+			map_level = settings['map_level_' + c];
 		
 	// only if this chart is selected, update it
 		if (chart == 'map') {
@@ -139,9 +162,52 @@
 			map_paths[c].transition()
 				.duration(1000)
 				.style('fill', function(d) {
-					var val = retrieve_value(metric, age, year, unit, d.id, sex, cause);
+					var g = lookups['geo'][d.id] ? lookups['geo'][d.id][map_level] : '',
+						val = retrieve_value(metric, age, year, unit, g, sex, cause);
 					if (isNaN(val)) return '#ccc';
 					else return choropleth_color(map_color_scales[c](val));	
 				});
+		
+		// highlight the selected country
+			map_highlights[c].transition()
+				.duration(1000)
+				.style('stroke-opacity', function(d) {
+				 	var	g = lookups['geo'][d.id]
+						gg = lookups['geo'][geo];
+					if (typeof g != 'undefined') {
+						if (g[gg.level] == geo) return 1;
+						else return 1e-6;
+					}
+					else {
+						return 1e-6;
+					}
+				});
+		
+		// change the mouseover if we've changed levels
+			if (current_map_level[c] != map_level) {
+				map_paths[c]
+		  			.attr('title', function(d) { 
+		  				if (typeof lookups['geo'][d.id] != 'undefined') {
+			  				var g = lookups['geo'][d.id][map_level],
+			  					t = lookups['geo'][g]['name']
+			  				return t;			
+		  				}
+		  				else return 'No Data';
+		  			});
+		  		$('.map_path').poshytip('destroy');
+		  		$('.map_path').poshytip({ 
+					slide: false, 
+					followCursor: true, 
+					alignTo: 'cursor', 
+					showTimeout: 0, 
+					hideTimeout: 0, 
+					alignX: 'center', 
+					alignY: 'inner-bottom', 
+					className: 'tip-twitter',
+					offsetY: 5
+				});
+			}
+		
+		current_map_level[c] = map_level;
 		}
 	}
