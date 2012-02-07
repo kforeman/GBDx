@@ -141,7 +141,9 @@
 		// find the scale
 			var map_vals = [];
 			geo_list.map(function(g) {
-				if (g.code != 'G') {
+				var gg = lookups['geo'][g.code] ? lookups['geo'][g.code]['level'] : '';
+				console.log(g.code, gg, map_level)
+				if (gg == map_level) {
 					year_list.map(function(y) {
 						map_vals.push(retrieve_value(metric, age, y.year_viz, unit, g.code, sex, cause));
 					});
