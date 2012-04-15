@@ -14,13 +14,14 @@
 	
 	// figure out which columns to grab
 	$result = mysql_query('DESC gbd_cfs'); 
+	$metric = mysql_real_escape_string($_GET['metric']);
 	$columns = array(); 
 	while (list($column) = mysql_fetch_array($result)) {
-  		if (substr($column,0,(strlen($_GET['metric'])+2)) == $_GET['metric'].'_l') {
-    		$columns[] = $column.' AS l'.substr($column,(strlen($_GET['metric'])+3)); 
+  		if (substr($column,0,(strlen($metric)+2)) == $metric.'_l') {
+    		$columns[] = $column.' AS l'.substr($column,(strlen($metric)+3)); 
   		}
-		else if (substr($column,0,(strlen($_GET['metric'])+2)) == $_GET['metric'].'_u') {
-    		$columns[] = $column.' AS u'.substr($column,(strlen($_GET['metric'])+3)); 
+		else if (substr($column,0,(strlen($metric)+2)) == $metric.'_u') {
+    		$columns[] = $column.' AS u'.substr($column,(strlen($metric)+3)); 
   		}
 	}
     	
@@ -28,7 +29,9 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT '.$columns.' FROM gbd_cfs WHERE geo_sex="'.$_GET['geo_sex'].'" AND cause_viz="'.$_GET['cause'].'";');
+	$geo_sex = mysql_real_escape_string($_GET['geo_sex']);
+	$cause = mysql_real_escape_string($_GET['cause']);
+	$result = mysql_query('SELECT '.$columns.' FROM gbd_cfs WHERE geo_sex="'.$geo_sex.'" AND cause_viz="'.$cause.'";');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
     

@@ -13,16 +13,19 @@
 	$db = mysql_select_db($db, $link);
 	
 	// figure out which columns to grab
+	$metric = mysql_real_escape_string($_GET['metric']);
 	$result = mysql_query('DESC gbd_cfs'); 
 	$columns = array(); 
 	while (list($column) = mysql_fetch_array($result))
-  		if (substr($column,0,(strlen($_GET['metric'])+2)) == $_GET['metric'].'_m') 
-    		$columns[] = $column.' AS m'.substr($column,(strlen($_GET['metric'])+3)); 
+  		if (substr($column,0,(strlen($metric)+2)) == $metric.'_m') 
+    		$columns[] = $column.' AS m'.substr($column,(strlen($metric)+3)); 
 	$columns = join(',',$columns);
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT geo_sex,'.$columns.' FROM gbd_cfs WHERE cause_viz="'.$_GET['cause_viz'].'" AND geo_sex LIKE "%_'.$_GET['sex'].'";');
+	$cause_viz = mysql_real_escape_string($_GET['cause_viz']);
+	$sex = mysql_real_escape_string($_GET['sex']);
+	$result = mysql_query('SELECT geo_sex,'.$columns.' FROM gbd_cfs WHERE cause_viz="'.$cause_viz.'" AND geo_sex LIKE "%_'.$sex.'";');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
     
