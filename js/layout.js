@@ -19,17 +19,12 @@
 		.style('background-color', bg);
 
 // title
-	body.append('div')
+	title = body.append('div')
 		.style('width', menu_width + 'px')
-		.attr('id', 'title')
-	  .append('center')
-	  	.text('GBD 2010');
-	 
-// loading gif
-//	loading_indicator = body.append('div')
-//		.attr('id', 'loading_indicator');
-//	loading_indicator.append('img')
-//		.attr('src', 'resources/loading.gif');
+		.attr('id', 'title');
+	
+	title.append('div')
+		.attr('class', 'logo');
 
 // add the righthand content section
 	content = body.append('div')

@@ -12,6 +12,15 @@
 	color: #555;
 }
 
+.logo {
+	background: url('../resources/logo.png');
+	height: 45px;
+	width: 250px;
+	float: left;
+	background-size: 100%;
+	background-repeat:no-repeat;
+}
+
 #loading_indicator {
 	position: absolute;
 	left: 15px;
