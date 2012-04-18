@@ -135,7 +135,7 @@
 
 // make a list of which depths a cause should be visible at
 	var treemap_depth_visibility = {'T': false},
-		treemap_highlight_visibility = {'T': false},
+		treemap_highlight_visibility = {'T': {1: true, 2: true, 3: true, 4: true}},
 		treemap_cause_classes = {'A': {'T': {}}, 'B': {'T': {}}};
 	$.map(tree_indices, function(i, c) {
 		treemap_depth_visibility[c] = {};
@@ -492,14 +492,14 @@
 			if (c == 'A') {
 				treemap_layout_A.nodes(treemap_data_A);
 				treemap_layout_A.value(function(d) {
-					return d[settings['geo_A'] + '_' + settings['sex_A']] ? (d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']] ? parseFloat(d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']]['m' + settings['age_A'] + '_' + settings['year_A']]) : 0) : 0;
+					return d[settings['geo_A'] + '_' + settings['sex_A']] ? (d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']] ? parseFloat(d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']]['mpc_' + settings['age_A'] + '_' + settings['year_A']]) : 0) : 0;
 				});
 				tree_cells['A'].data(treemap_layout_A);	
 			}
 			else if (c == 'B') {
 				treemap_layout_B.nodes(treemap_data_B);
 				treemap_layout_B.value(function(d) {
-					return d[settings['geo_B'] + '_' + settings['sex_B']] ? (d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']] ? parseFloat(d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']]['m' + settings['age_B'] + '_' + settings['year_B']]) : 0) : 0;
+					return d[settings['geo_B'] + '_' + settings['sex_B']] ? (d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']] ? parseFloat(d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']]['mpc_' + settings['age_B'] + '_' + settings['year_B']]) : 0) : 0;
 				});
 				tree_cells['B'].data(treemap_layout_B);	
 			}
@@ -527,9 +527,12 @@
 				.style('fill', function(d) { return color_treemap(settings['tree_color_' + c], d, 'b', c); });
 		
 		// find position of highlight
-			var cause_index = tree_indices[cause],
-				dd = 'treemap_data_' + c;
-			cause_index.map(function(i) { dd = dd + '["children"][' + i + ']'; });
+			if (cause == 'T') dd = 'treemap_data_' + c;
+			else {
+				var cause_index = tree_indices[cause],
+					dd = 'treemap_data_' + c;
+				cause_index.map(function(i) { dd = dd + '["children"][' + i + ']'; });	
+			}
 			eval('var highlight = ' + dd);
 		
 		// move the highlight
@@ -644,13 +647,10 @@
 
 				
 // this fellow recursively adds the data for selected geo, age, sex, year to the existing tree
-		function append_leaf(leaf) {
-			var cause_index = tree_indices[leaf.cause_viz],
-				dd = 'treemap_data_' + this['c'];
-			if (typeof cause_index != 'undefined') cause_index.map(function(i) { dd = dd + '["children"][' + i + ']'; });
-			eval('if (typeof ' + dd + '["' + this['geo'] + '_' + this['sex'] + '"] == "undefined") ' + dd + '["' + this['geo'] + '_' + this['sex'] + '"]  = {};');
-			eval(dd + '["' + this['geo'] + '_' + this['sex'] + '"]["' + this['metric'] + '"] = leaf;');
-		}
-
-
-
+	function append_leaf(leaf) {
+		var cause_index = tree_indices[leaf.cause_viz],
+			dd = 'treemap_data_' + this['c'];
+		if (typeof cause_index != 'undefined') cause_index.map(function(i) { dd = dd + '["children"][' + i + ']'; });
+		eval('if (typeof ' + dd + '["' + this['geo'] + '_' + this['sex'] + '"] == "undefined") ' + dd + '["' + this['geo'] + '_' + this['sex'] + '"]  = {};');
+		eval(dd + '["' + this['geo'] + '_' + this['sex'] + '"]["' + this['metric'] + '"] = leaf;');
+	}

@@ -1,7 +1,7 @@
 <?php
 /*	Author:		Kyle Foreman (kforeman@post.harvard.edu)
 	Date:		9 January 2012
-	Purpose:	Load totals (envelopes/population) from MySQL
+	Purpose:	Load populations from MySQL
 */
 
 	// load in mysql server configuration
@@ -13,7 +13,7 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT * FROM gbd_totals;');
+	$result = mysql_query('SELECT * FROM gbdx_pop;');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
 		

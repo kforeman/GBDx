@@ -38,35 +38,18 @@
 
 // load data by geo/sex (for treemaps)
 	function download_treemap_data(geo, sex, metric) {
-		// download from mysql if online
-		if (use_mysql) {
-			$.ajax({
-				url: 'php/treemap_data.php?geo_sex=' + geo + '_' + sex + '&metric=' + metric,
-				dataType: 'json',
-				async: false,
-				success: function(json) {
-					json.map(function(d) {
-						estimates[geo][sex][metric][d.cause_viz] = d;
-					});
-					loaded_treemap_data[geo + '_' + sex + '_' + metric] = 1;
-				}
-			});		
-		}
-		// otherwise open the csv
-		else {
-			$.ajax({
-				url: 'data/treemap/' + geo + '_' + sex + '_' + metric + '.csv',
-				dataType: 'text',
-				async: false,
-				success: function(csv) {
-					var data = d3.csv.parse(csv);
-					data.map(function(d) {
-						estimates[geo][sex][metric][d.cause_viz] = d;
-					});
-					loaded_treemap_data[geo + '_' + sex + '_' + metric] = 1;
-				}
-			});	
-		}
+		$.ajax({
+			url: use_mysql ? 'php/treemap_data.php?geo_sex=' + geo + '_' + sex + '&metric=' + metric : 'data/treemap/' + geo + '_' + sex + '_' + metric + '.csv',
+			dataType: use_mysql ? 'json' : 'text',
+			async: false,
+			success: function(data) {
+				if (!use_mysql) data = d3.csv.parse(data);
+				data.forEach(function(d) {
+					estimates[geo][sex][metric][d.cause_viz] = d;
+				});
+				loaded_treemap_data[geo + '_' + sex + '_' + metric] = 1;
+			}
+		});		
 	}
 
 // function to retrieve estimates for a given cause/sex/metric
@@ -87,41 +70,21 @@
 
 // load data by cause and sex (for maps)
 	function download_map_data(cause, sex, metric) {
-		// download from mysql if we're online
-		if (use_mysql) {
-			$.ajax({
-				url: 'php/map_data.php?cause_viz=' + cause + '&sex=' + sex + '&metric=' + metric,
-				dataType: 'json',
-				async: false,
-				success: function(json) {
-					json.map(function(d) {
-						var gs = d.geo_sex.split('_'),
-							g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
-							s = (gs.length == 2 ? gs[1] : gs[2]);
-						if (estimates[g]) estimates[g][s][metric][cause] = d;
-					});
-					loaded_map_data[cause + '_' + sex + '_' + metric] = 1;
-				}
-			});
-		}
-		// otherwise open the csv
-		else {
-			$.ajax({
-				url: 'data/map/' + cause + '_' + sex + '_' + metric + '.csv',
-				dataType: 'text',
-				async: false,
-				success: function(csv) {
-					var data = d3.csv.parse(csv);
-					data.map(function(d) {
-						var gs = d.geo_sex.split('_'),
-							g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
-							s = (gs.length == 2 ? gs[1] : gs[2]);
-						if (estimates[g]) estimates[g][s][metric][cause] = d;
-					});
-					loaded_map_data[cause + '_' + sex + '_' + metric] = 1;
-				}
-			});	
-		}
+		$.ajax({
+			url: use_mysql ? 'php/map_data.php?cause_viz=' + cause + '&sex=' + sex + '&metric=' + metric : 'data/map/' + cause + '_' + sex + '_' + metric + '.csv',
+			dataType: use_mysql ? 'json' : 'text',
+			async: false,
+			success: function(data) {
+				if (!use_mysql) data = d3.csv.parse(data);
+				data.map(function(d) {
+					var gs = d.geo_sex.split('_'),
+						g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
+						s = (gs.length == 2 ? gs[1] : gs[2]);
+					if (estimates[g]) estimates[g][s][metric][cause] = d;
+				});
+				loaded_map_data[cause + '_' + sex + '_' + metric] = 1;
+			}
+		});
 	}
 
 // find rf estimates for a geo/cause/sex/risk
@@ -130,7 +93,7 @@
 			if (loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] != 1) download_treemap_rf(geo, sex, metric, risk);
 		
 		// return the value
-			return treemap_rfs[geo][sex][metric][risk][cause] ? (treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year] ? parseFloat(treemap_rfs[geo][sex][metric][risk][cause]['m' + age + '_' + year]) : 0) : 0;
+			return treemap_rfs[geo][sex][metric][risk][cause] ? (treemap_rfs[geo][sex][metric][risk][cause]['mpc_' + age + '_' + year] ? parseFloat(treemap_rfs[geo][sex][metric][risk][cause]['mpc_' + age + '_' + year]) : 0) : 0;
 	}
 
 // load risk proportions for a given geo/sex/metric/risk (for treemaps with risks)
@@ -176,18 +139,18 @@
 // return a value in correct units (must already be downloaded)
 	function retrieve_value(metric, age, year, unit, geo, sex, cause) {
 		try {
-			var pop = parseInt(totals[geo][sex]['pop_' + age + '_' + year]),
-				env = parseFloat(totals[geo][sex][metric + '_' + age + '_' + year]),
-				cf = parseFloat(estimates[geo][sex][metric][cause]['m' + age + '_' + year]);
+			var pop = parseInt(pops[geo][sex]['pop_' + age + '_' + year]),
+				nm = parseFloat(estimates[geo][sex][metric][cause]['mnm_' + age + '_' + year]),
+				pc = parseFloat(estimates[geo][sex][metric][cause]['mpc_' + age + '_' + year]);
 			switch(unit) {
 				case 'prop':
-					return cf;
+					return pc;
 					break;
 				case 'num':
-					return cf * env;
+					return nm;
 					break;
 				case 'rate':
-					return cf * env * 100000 / pop;
+					return nm / pop * 100000;
 					break;
 			}
 		}
@@ -200,20 +163,21 @@
 	function retrieve_uncertainty(geo, sex, cause, year, age, metric, unit) {
 		if (use_mysql && loaded_uncertainty[geo + '_' + sex + '_' + metric + '_' + cause] != 1) download_uncertainty(geo, sex, cause, metric);
 		try {
-			var pop = parseInt(totals[geo][sex]['pop_' + age + '_' + year]),
-				env = parseFloat(totals[geo][sex][metric + '_' + age + '_' + year]),
+			var pop = parseInt(pops[geo][sex]['pop_' + age + '_' + year]),
 				m = retrieve_value(metric, age, year, unit, geo, sex, cause),
-				l = parseFloat(estimates[geo][sex][metric][cause]['l' + age + '_' + year]),
-				u = parseFloat(estimates[geo][sex][metric][cause]['u' + age + '_' + year]);
+				l_pc = parseFloat(estimates[geo][sex][metric][cause]['lpc_' + age + '_' + year]),
+				l_nm = parseFloat(estimates[geo][sex][metric][cause]['lnm_' + age + '_' + year]),
+				u_pc = parseFloat(estimates[geo][sex][metric][cause]['upc_' + age + '_' + year]),
+				u_nm = parseFloat(estimates[geo][sex][metric][cause]['unm_' + age + '_' + year]);
 			switch(unit) {
 				case 'prop':
-					return [m, l, u];
+					return [m, l_pc, u_pc];
 					break;
 				case 'num':
-					return [m, l*env, u*env];
+					return [m, l_nm, u_nm];
 					break;
 				case 'rate':
-					return [m, l*env*100000/pop, u*env*100000/pop];
+					return [m, l_nm / pop * 100000, u_nm / pop * 100000];
 					break;
 			}
 		}

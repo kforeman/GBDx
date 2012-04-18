@@ -101,39 +101,22 @@
 		});
 	}
 
-// go ahead and load in totals (envelopes/pop)
-	var totals = {};
+// go ahead and load in populations
+	var pops = {};
 	geo_list.map(function(g) {
-		totals[g.code] = {};
+		pops[g.code] = {};
 	});
-	if (use_mysql) {
-		$.ajax({
-			url: 'php/totals.php',
-			dataType: 'json',
-			async: false,
-			success: function(json) {
-				json.map(function(d) {
-					var gs = d.geo_sex.split('_'),
-						g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
-						s = (gs.length == 2 ? gs[1] : gs[2]);
-					if (totals[g]) totals[g][s] = d;
-				});
-			}
-		});	
-	}
-	else {
-		$.ajax({
-			url: 'data/totals/totals.csv',
-			dataType: 'text',
-			async: false,
-			success: function(csv) {
-				data = d3.csv.parse(csv);
-				data.map(function(d) {
-					var gs = d.geo_sex.split('_'),
-						g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
-						s = (gs.length == 2 ? gs[1] : gs[2]);
-					if (totals[g]) totals[g][s] = d;
-				});
-			}
-		});
-	}
+	$.ajax({
+		url: use_mysql ? 'php/pops.php' : 'data/pops/pop.csv',
+		dataType: use_mysql ? 'json' : 'text',
+		async: false,
+		success: function(data) {
+			if (!use_mysql) data = d3.csv.parse(data);
+			data.map(function(d) {
+				var gs = d.geo_sex.split('_'),
+					g = (gs.length == 2 ? gs[0] : gs[0] + '_' + gs[1]),
+					s = (gs.length == 2 ? gs[1] : gs[2]);
+				if (pops[g]) pops[g][s] = d;
+			});
+		}
+	});	

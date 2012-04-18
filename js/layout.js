@@ -39,13 +39,13 @@
 		.style('height', (height / 2 + content_buffer) + 'px')
 	  .append('svg')
 		.attr('id', 'A')
-		.style('height', height / 2)
-		.style('width', content_width)
+		.style('height', (height / 2) + 'px')
+		.style('width', content_width + 'px')
 		.style('background-color', bg);
 	B = content.append('div')
 		.style('height', (height / 2 + content_buffer) + 'px')
 	  .append('svg')
 		.attr('id', 'B')
-		.style('height', height / 2)
-		.style('width', content_width)
+		.style('height', (height / 2) + 'px')
+		.style('width', content_width + 'px')
 		.style('background-color', bg);

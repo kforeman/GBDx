@@ -13,7 +13,7 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT * FROM gbd_risks ORDER BY risk_name;');
+	$result = mysql_query('SELECT * FROM gbdx_risks ORDER BY risk_sort;');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
 		

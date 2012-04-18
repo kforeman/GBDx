@@ -14,7 +14,7 @@
 	
 	// figure out which columns to grab
 	$metric = mysql_real_escape_string($_GET['metric']);
-	$result = mysql_query('DESC gbd_cfs'); 
+	$result = mysql_query('DESC gbdx_cfs'); 
 	$columns = array(); 
 	while (list($column) = mysql_fetch_array($result))
   		if (substr($column,0,(strlen($metric)+2)) == $metric.'_m') 
@@ -25,7 +25,7 @@
 	$rows = array();
 	$cause_viz = mysql_real_escape_string($_GET['cause_viz']);
 	$sex = mysql_real_escape_string($_GET['sex']);
-	$result = mysql_query('SELECT geo_sex,'.$columns.' FROM gbd_cfs WHERE cause_viz="'.$cause_viz.'" AND geo_sex LIKE "%_'.$sex.'";');
+	$result = mysql_query('SELECT geo_sex,'.$columns.' FROM gbdx_cfs WHERE cause_viz="'.$cause_viz.'" AND geo_sex LIKE "%_'.$sex.'";');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
     

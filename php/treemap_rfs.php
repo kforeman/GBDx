@@ -13,11 +13,11 @@
 	$db = mysql_select_db($db, $link);
 	
 	// figure out which columns to grab
-	$result = mysql_query('DESC gbd_rfs'); 
+	$result = mysql_query('DESC gbdx_rfs'); 
 	$columns = array(); 
 	$metric = mysql_real_escape_string($_GET['metric']);
 	while (list($column) = mysql_fetch_array($result))
-  		if (substr($column,0,strlen($metric)) == $metric) 
+  		if (substr($column,0,strlen($metric)+3) == $metric.'_pc') 
     		$columns[] = $column.' AS m'.substr($column,(strlen($metric)+1)); 
 	$columns = join(',',$columns);
 
@@ -25,7 +25,7 @@
 	$rows = array();
 	$geo_sex = mysql_real_escape_string($_GET['geo_sex']);
 	$risk = mysql_real_escape_string($_GET['risk']);
-	$result = mysql_query('SELECT cause_viz,geo_sex,'.$columns.' FROM gbd_rfs WHERE geo_sex="'.$geo_sex.'" AND risk="'.$risk.'";');
+	$result = mysql_query('SELECT cause_viz,geo_sex,'.$columns.' FROM gbdx_rfs WHERE geo_sex="'.$geo_sex.'" AND risk="'.$risk.'";');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
     

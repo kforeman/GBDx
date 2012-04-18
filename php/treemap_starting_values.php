@@ -13,7 +13,7 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT cause_viz, AVG(daly_m_22_3) AS treemap_start_val FROM gbd_cfs WHERE geo_sex="G_M" OR geo_sex="G_F" GROUP BY (cause_viz);');
+	$result = mysql_query('SELECT cause_viz, AVG(daly_m_pc_22_3) AS treemap_start_val FROM gbdx_cfs WHERE geo_sex="G_M" OR geo_sex="G_F" GROUP BY (cause_viz);');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
 		

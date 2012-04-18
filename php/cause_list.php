@@ -13,7 +13,7 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT * FROM gbd_causes ORDER BY cause_sort;');
+	$result = mysql_query('SELECT * FROM gbdx_causes ORDER BY cause_sort;');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
 		

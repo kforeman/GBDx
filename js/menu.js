@@ -176,7 +176,7 @@
 	  	  .enter().append('option')
 	  	  	.attr('id', function(d) { return 'cause_option_' + e.val + '_' + d.cause_viz; })
 	  	  	.attr('value', function(d) { return d.cause_viz; })
-	  	  	.text(function(d) { return d.cause + '. ' + d.cause_name; })
+	  	  	.text(function(d) { return d.cause == 'Total' ? d.cause_name : d.cause + '. ' + d.cause_name; })
 	  	  	.style('font-weight', function(d) { return (d.cause_viz.match(/_/g) == null ? 0 : d.cause_viz.match(/_/g).length) <= 2 ? 'bold' : 'normal'; })
 	  	  	.style('margin-left', function(d) { return ((d.cause_viz.match(/_/g) == null ? 0 : d.cause_viz.match(/_/g).length) * 5) + 'px'; })
 	  	$('#cause_option_' + e.val + '_' + settings['cause_' + e.val])[0].selected = true;
@@ -542,7 +542,10 @@
 	  	  .enter().append('option')
 	  	  	.attr('id', function(d) { return 'tree_risk_option_' + e.val + '_' + d.risk; })
 	  	  	.attr('value', function(d) { return d.risk; })
-	  	  	.text(function(d) { return d.risk_name; });
+	  	  	.text(function(d) { return d.risk_name; })
+	  	  	.style('font-weight', function(d) { return d.risk_level == 1 ? 'bold' : 'normal'; })
+			.style('font-style', function(d) { return d.risk_level == 3 ? 'italic' : 'normal'; })
+	  	  	.style('margin-left', function(d) { return ((d.risk_level-1) * 5) + 'px'; });
 	  	$('#tree_risk_option_' + e.val + '_' + settings['tree_risk_' + e.val])[0].selected = true;
 	  	$('#tree_risk_select_' + e.val).chosen({ disable_search_threshold: 10 });
 	});

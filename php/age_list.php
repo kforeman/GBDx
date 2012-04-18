@@ -13,7 +13,7 @@
 
 	// perform the query
 	$rows = array();
-	$result = mysql_query('SELECT * FROM gbd_age ORDER BY age_viz;');
+	$result = mysql_query('SELECT * FROM gbdx_age ORDER BY age_viz;');
 	while($row = mysql_fetch_array($result, MYSQL_ASSOC))
     	$rows[] = $row;
 		
