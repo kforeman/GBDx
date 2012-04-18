@@ -6,8 +6,8 @@ Updated:	2 January 2012
 Purpose:	Create an efficient database structure for the GBD visualization tool
 */
 
-global upload_main = 1
-global upload_risks = 1
+global upload_main = 0
+global upload_risks = 0
 global submit_offline = 0
 global this_date = "Apr18_2012"
 
@@ -240,8 +240,6 @@ global this_date = "Apr18_2012"
 		}
 		odbc exec("LOAD DATA LOCAL INFILE '$tmp_dir/gbd_pop.txt' INTO TABLE gbdx_pop_new FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n';"), dsn($dsn)
 		odbc exec("ALTER TABLE gbdx_pop_new ADD INDEX (geo_sex);"), dsn($dsn)
-		odbc exec("DROP TABLE IF EXISTS gbdx_pop_${this_date};"), dsn($dsn) 
-		odbc exec("CREATE TABLE gbdx_pop_${this_date} SELECT * FROM gbdx_pop_new;"), dsn($dsn)
 		odbc exec("DROP TABLE IF EXISTS gbdx_pop;"), dsn($dsn) 
 		odbc exec("ALTER TABLE gbdx_pop_new RENAME TO gbdx_pop;"), dsn($dsn)
 
