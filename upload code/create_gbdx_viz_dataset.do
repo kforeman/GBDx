@@ -113,10 +113,11 @@ global this_date = "Apr18_2012"
 		replace cause_sort = -1 in `num_obs'
 		replace cause_viz = "T" in `num_obs'
 		replace leaf = 0 in `num_obs'
+		replace cause_level = 0 in `num_obs'
 	// upload to the server
 		compress
 		odbc exec("DROP TABLE IF EXISTS gbdx_causes;"), dsn($dsn)
-		odbc insert cause cause_short cause_name cause_color cause_sort cause_viz leaf, table("gbdx_causes") dsn($dsn) create
+		odbc insert cause cause_short cause_level cause_name cause_color cause_sort cause_viz leaf, table("gbdx_causes") dsn($dsn) create
 	// save temp version for below
 		keep cause cause_viz
 		tempfile new_causes
