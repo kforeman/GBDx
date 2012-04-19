@@ -17,6 +17,8 @@
 			{ val: 'tree_color',label: 'Color',		type: 'select',	section: 'tree' },
 			{ val: 'tree_risk',	label: 'Risk',		type: 'select',	section: 'tree' },
 			{ val: 'map_level',	label: 'Level',		type: 'select',	section: 'map' 	},
+			{ val: 'sbar_cat',	label: 'Risks',		type: 'select',	section: 'sbar'	},
+			{ val: 'sbar_unit',	label: 'Units',		type: 'radio',	section: 'sbar'	}
 		];
 
 // determine if this is the offline version
@@ -25,7 +27,7 @@
 // create some default settings
 	var defaults = {
 		chart_sync:		false,
-		chart_A:		'treemap',
+		chart_A:		'sbar',
 		chart_B:		'map',
 		geo_sync:		true,
 		geo_A:			'G',
@@ -48,7 +50,11 @@
 		tree_risk_A:	'alcohol_eg',
 		tree_risk_sync:	true,
 		map_level_A:	'C',
-		map_level_sync:	true
+		map_level_sync:	true,
+		sbar_cat_A:		'summary',
+		sbar_cat_sync:	true,
+		sbar_unit_A:	'rate',
+		sbar_unit_sync:	true
 	};
 
 // copy the default settings for A into the AB setting; also, make sure A & B are mirrored if synced
@@ -71,7 +77,8 @@
 	var chart_list = [	
 		{ val: 'treemap', 	label: 'Treemap' },
 		{ val: 'map', 		label: 'Map' },
-		{ val: 'time_age',	label: 'Time/Age Plots' }
+		{ val: 'time_age',	label: 'Time/Age Plots' },
+		{ val: 'sbar',		label: 'Stacked Bar Chart' }
 		//{ val: 'table',		label: 'Table' }
 	];
 
@@ -103,3 +110,20 @@
 
 // AB looper
 	var AB = ['A', 'B'];
+
+// function for finding good tick formats
+	function tick_formatter(max) {
+		if (settings.unit == 'prop') {
+			if (max <= .0005) return d3.format('.2%');
+			else if (max <= .005) return d3.format('.1%');
+			else if (max <= .05) return d3.format('.1%');
+			else return d3.format('.0%');
+		}
+		else {
+			if (max <= .5) return d3.format('.2f');
+			else if (max < 5) return d3.format('.1f');
+			else if (max <= 1000) return d3.format('.0f');
+			else if (max <= 10000) return d3.format('.2s');
+			else return d3.format('s');
+		}
+	}

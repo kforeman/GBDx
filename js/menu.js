@@ -31,6 +31,14 @@
 	map_menu = accordion.append('div')
 		.attr('class', 'accordion_section');
 
+// add a stacked bar RF menu
+	accordion.append('h3')
+	  .append('a')
+		.attr('href', '#')
+		.text('Stacked Bar Settings');
+	sbar_menu = accordion.append('div')
+		.attr('class', 'accordion_section');
+
 // turn it into an accordion
 	$('#accordion').accordion({ fillSpace: true });
 
@@ -406,7 +414,7 @@
 	
 // bug report button
 	main_menu.append('div')
-		.style('top', '500px')
+		.style('top', '480px')
 		.style('position', 'absolute')
 		.style('width', '250px')
   	  .append('center')
@@ -616,6 +624,98 @@
 	update_functions['map_level'] = change_map_level;
 
 
+// fill in the sbar menu
+	menu_entries.filter(function(d) {
+		 return d.section == 'sbar';
+	}).map(function(e, i) {
+		// a label identifying the menu entry, which toggles sync when clicked
+			sbar_menu.append('div')
+			  .append('center')
+				.attr('id', 'menu_label_' + e.val)
+				.attr('onclick', 'toggle_sync("' + e.val + '")')
+				.attr('class', 'menu_label')
+				.style('top', ((menu_row_height * (i + .5)) - (menu_font_size / 2) + (i * menu_row_buffer)) + 'px')
+				.style('font-size', menu_font_size + 'px')
+				.style('line-height', menu_font_size + 'px')
+				.style('font-style', settings[e.val + '_sync'] ? 'italic' : 'normal')
+				.style('width', menu_label_width + 'px')
+				.text(e.label);
+		// divs for the controls
+			menu_control_list.map(function(f) {
+				sbar_menu.append('div')
+					.attr('id', 'menu_control_' + e.val + '_' + f.val)
+					.attr('class', 'menu_control')
+					.style('top', ((menu_row_height * (i + f.offset)) + (i * menu_row_buffer)) + 'px')
+					.style('height', (menu_row_height / 2) + 'px')
+					.style('width', (menu_width - menu_label_width) + 'px')
+					.style('visibility', ((settings[e.val + '_sync'] && f.val == 'AB') || (!settings[e.val + '_sync'] && f.val != 'AB')) ? 'visible' : 'hidden')
+					.style('left', menu_label_width + 'px');
+			});
+	});
+
+// update the categories for the risk bars
+	function change_sbar_cat(c, val) {
+		// update the settings
+			update_settings('sbar_cat', c, val);
+		// update the charts
+			update_charts(c);
+	}
+	update_functions['sbar_cat'] = change_sbar_cat;
+
+// risk category selector	
+	menu_control_list.map(function(e) {
+		var s = d3.select('#menu_control_sbar_cat_' + e.val)
+				  .append('select')
+					.attr('id', 'sbar_cat_select_' + e.val)
+					.attr('class', 'sbar_cat_select_menu')
+					.attr('onchange', 'change_sbar_cat("' + e.val + '",this.value)');
+		s.append('option')
+			.attr('id', 'sbar_cat_option_' + e.val + '_summary')
+			.attr('value', 'summary')
+			.text('Summary (Categories)');
+		s.selectAll()
+		  	.data(risk_list.filter(function(d) { return d.risk_level == 1; }))
+	  	  .enter().append('option')
+	  	  	.attr('id', function(d) { return 'sbar_cat_option_' + e.val + '_' + d.risk; })
+	  	  	.attr('value', function(d) { return d.risk; })
+	  	  	.text(function(d) { return d.risk_name; });
+	  	$('#sbar_cat_option_' + e.val + '_' + settings['sbar_cat_' + e.val])[0].selected = true;
+	  	$('#sbar_cat_select_' + e.val).chosen();
+	});
+
+// buttons for sbar units
+	menu_control_list.map(function(e) {
+		var s = d3.select('#menu_control_sbar_unit_' + e.val)
+				  .append('form')
+					.attr('id', 'sbar_unit_radio_' + e.val);
+		[{ val: 'num', name: '#' },
+		 { val: 'rate', name: 'Rate' }].map(function(d) {
+			 s.append('input')
+				.attr('type', 'radio')
+				.attr('name', 'sbar_unit_radio_' + e.val)
+				.attr('class', 'sbar_unit_radio_' + e.val)
+				.attr('id', 'sbar_unit_radio_' + d.val + '_' + e.val)
+				.attr('value', d.val)
+				.attr(settings['sbar_unit_' + e.val] == d.val ? 'checked' : 'ignoreme', 'true');
+			s.append('label')
+				.attr('for', 'sbar_unit_radio_' + d.val + '_' + e.val)
+				.text(d.name);
+		 });
+		 $('#sbar_unit_radio_' + e.val).buttonset()
+		 	.css('margin-left', '44px')
+		 	.change(function() { change_sbar_unit(e.val, $('.sbar_unit_radio_' + e.val + ':checked').val()); });
+	});
+
+// change units
+	function change_sbar_unit(c, val) {
+		// update the settings
+			update_settings('sbar_unit', c, val);
+		// update the charts
+			update_charts(c);
+	}
+	update_functions['sbar_unit'] = change_sbar_unit;
+
+
 // function to choose the correct value in a select menu
 	function update_select(m, c, val) {
 		$('#' + m + '_option_' + c + '_' + val)[0].selected = true;
@@ -683,7 +783,7 @@
 		// if switching to synced mode, match B to A
 			if (settings[m + '_sync']) {
 				update_functions[m]('B', settings[m + '_AB']);
-				update_slider(m, 'B', settings[m + '_AB'], true);
+				if (menu_entries.filter(function(d) { return d.val == m; })[0].type == 'slider')update_slider(m, 'B', settings[m + '_AB'], true);
 			}
 	}
 	
@@ -694,11 +794,13 @@
 				refresh_treemap(e);
 				refresh_map(e);
 				refresh_time_age(e);
+				refresh_sbar(e);
 			});		
 		}
 		else {
 			refresh_treemap(c);
 			refresh_map(c);
 			refresh_time_age(c);
+			refresh_sbar(c);
 		}
 	}

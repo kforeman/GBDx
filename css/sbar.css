@@ -1,0 +1,26 @@
+.risk_y.axis line, .risk_y.axis path {
+	stroke: 		#444;
+	fill: 			none;
+}
+
+.risk_y.axis text {
+	fill: 			#444;
+	text-shadow: 	none;
+	font-size: 		12px;
+}
+
+.risk_x.axis line, .risk_x.axis path {
+	stroke: 		#444;
+	fill: 			none;
+}
+
+.risk_x.axis text {
+	fill: 			#444;
+	text-shadow: 	none;
+	font-size:	 	12px;
+}
+
+.sbar_rect {
+	stroke: 		#fff;
+	stroke-width:	1px;
+}

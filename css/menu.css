@@ -25,7 +25,7 @@
 /* position menu elements */
 .accordion_section {
 	position: relative;
-	overflow-x: hidden !important;
+	overflow: hidden !important;
 }
 .menu_label {
 	position: absolute;

@@ -8,19 +8,25 @@
 		loaded_treemap_data = {},
 		loaded_map_data = {},
 		loaded_treemap_rfs = {},
+		loaded_sbar_rfs = {},
 		loaded_uncertainty = {},
-		treemap_rfs = {};
+		treemap_rfs = {},
+		sbar_rfs = {};
 	geo_list.map(function(g) {
 		estimates[g.code] = {};
 		treemap_rfs[g.code] = {};
+		sbar_rfs[g.code] = {};
 		['M', 'F'].map(function(s) {
 			estimates[g.code][s] = {};	
 			treemap_rfs[g.code][s] = {};
+			sbar_rfs[g.code][s] = {};
 			metric_list.map(function(m) {
 				estimates[g.code][s][m.val] = {};
 				treemap_rfs[g.code][s][m.val] = {};
+				sbar_rfs[g.code][s][m.val] = {};
 				risk_list.map(function(r) {
 					treemap_rfs[g.code][s][m.val][r.risk] = {};
+					sbar_rfs[g.code][s][m.val][r.risk] = {};
 				});
 			});
 		});
@@ -135,6 +141,54 @@
 			});	
 		}
 	}
+
+// load risk values for a given geo/sex/metric/category (for stacked bar charts)
+	function download_sbar_rf(geo, sex, metric, category) {
+		$.ajax({
+			url:	use_mysql ? 'php/sbar_rfs.php?geo_sex=' + geo + '_' + sex + '&metric=' + metric + '&category=' + category : 'data/sbar_risks/' + geo + '_' + sex + '_' + metric + '_' + cat + '.csv',
+			dataType:	use_mysql ? 'json' : 'text',
+			async:		false,
+			success:	function(data) {
+				if (!use_mysql) data = d3.csv.parse(data);
+				data.forEach(function(d) {
+					sbar_rfs[geo][sex][metric][d.risk][d.cause_viz] = d;
+				});
+				loaded_sbar_rfs[geo + '_' + sex + '_' + metric + '_' + category] = 1;
+			},
+			error: function() {
+				loaded_sbar_rfs[geo + '_' + sex + '_' + metric + '_' + category] = 1;
+			}
+		});
+	}
+
+// retrieve the risk values in an appropriate stacked bar format
+	function retrieve_sbar_rf(geo, sex, metric, category) {
+		// download if necessary
+			if (loaded_sbar_rfs[geo + '_' + sex + '_' + metric + '_' + category] != 1) download_sbar_rf(geo, sex, metric, category);
+		// make an array in which to hold the results
+			var bar_values = [];
+		// first loop through the causes
+			risk_causes.forEach(function(c) {
+			// start an array to store the values for each risk
+				var tmp = [];
+			// loop through the risks
+				risks_by_cat[category].forEach(function(r) {
+				// add the values for this risk to the cause's array
+					tmp.push(sbar_rfs[geo][sex][metric][r][c.cause_viz]);
+				});
+			// add a new entry for this cause
+				bar_values.push(tmp)			
+			});
+		// also make an object for the totals for each bar
+			var bar_totals = [];
+			risks_by_cat[category].forEach(function(r) {
+				bar_totals.push(sbar_rfs[geo][sex][metric][r]['T']);
+			});
+		// return the result
+			return { values: bar_values, totals: bar_totals };
+	}
+
+
 
 // return a value in correct units (must already be downloaded)
 	function retrieve_value(metric, age, year, unit, geo, sex, cause) {
