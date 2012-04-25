@@ -715,6 +715,12 @@
 	}
 	update_functions['sbar_sort'] = change_sbar_sort;
 
+// area for legend
+	var sbar_legend = sbar_menu.append('div').append('svg')
+		.attr('width', (menu_width - 20) + 'px')
+		.attr('height', '350px')
+		.style('margin-top', '130px')
+		.style('margin-left', '10px');
 
 // function to choose the correct value in a select menu
 	function update_select(m, c, val) {

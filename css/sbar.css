@@ -24,3 +24,10 @@
 	stroke: 		#fff;
 	stroke-width:	1px;
 }
+
+.sbar_legend {
+	fill:			#444;
+	text-shadow:	none;
+	font-size:		12px;
+	text-anchor:	start;
+}

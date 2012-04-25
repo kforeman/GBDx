@@ -46,7 +46,7 @@
 	});
 
 // colors for stacked bars
-	sbar_color_lookup = {
+	var sbar_color_lookup = {
 		1:	treemap_color_list['A'][6],
 		2:	treemap_color_list['A'][4],
 		3:	treemap_color_list['A'][2],
@@ -327,3 +327,30 @@
 				offsetY: 5
 		});
 	}
+
+// fill in the legend
+	var sbar_legend_entries = [
+		{ name: 'HIV & TB', 					color: sbar_color_lookup[1] },
+		{ name: 'Predominantly in Children', 	color: sbar_color_lookup[2] },
+		{ name: 'Other Communicable', 			color: sbar_color_lookup[3] },
+		{ name: 'Cancers', 						color: sbar_color_lookup[4] },
+		{ name: 'Other Non-Communicable',		color: sbar_color_lookup[5] },
+		{ name: 'Cardiovascular',				color: sbar_color_lookup[6] },
+		{ name: 'Unintentional Injuries',		color: sbar_color_lookup[7] },
+		{ name: 'Intentional Injuries',			color: sbar_color_lookup[8] }
+	]
+	var sbar_legend_gs = sbar_legend.selectAll('entries')
+		.data(sbar_legend_entries)
+	  .enter().append('g')
+		.attr('transform', function(d,i) { return 'translate(0, ' + (i * (350/sbar_legend_entries.length)) + ')'; });
+	sbar_legend_gs.append('rect')
+		.attr('width', 20)
+		.attr('height', 20)
+		.style('stroke', 'none')
+		.style('fill', function(d) { return d.color; });
+	sbar_legend_gs.append('text')
+		.attr('x', 30)
+		.attr('y', 15)
+		.text(function(d) { return d.name; })
+		.attr('class', 'sbar_legend');
+	
