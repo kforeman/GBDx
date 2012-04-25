@@ -683,37 +683,37 @@
 	  	$('#sbar_cat_select_' + e.val).chosen();
 	});
 
-// buttons for sbar units
+// buttons for sbar sort
 	menu_control_list.map(function(e) {
-		var s = d3.select('#menu_control_sbar_unit_' + e.val)
+		var s = d3.select('#menu_control_sbar_sort_' + e.val)
 				  .append('form')
-					.attr('id', 'sbar_unit_radio_' + e.val);
-		[{ val: 'num', name: '#' },
-		 { val: 'rate', name: 'Rate' }].map(function(d) {
+					.attr('id', 'sbar_sort_radio_' + e.val);
+		[{ val: 'rank', name: 'Rank' },
+		 { val: 'alpha', name: 'Alphabetic' }].map(function(d) {
 			 s.append('input')
 				.attr('type', 'radio')
-				.attr('name', 'sbar_unit_radio_' + e.val)
-				.attr('class', 'sbar_unit_radio_' + e.val)
-				.attr('id', 'sbar_unit_radio_' + d.val + '_' + e.val)
+				.attr('name', 'sbar_sort_radio_' + e.val)
+				.attr('class', 'sbar_sort_radio_' + e.val)
+				.attr('id', 'sbar_sort_radio_' + d.val + '_' + e.val)
 				.attr('value', d.val)
-				.attr(settings['sbar_unit_' + e.val] == d.val ? 'checked' : 'ignoreme', 'true');
+				.attr(settings['sbar_sort_' + e.val] == d.val ? 'checked' : 'ignoreme', 'true');
 			s.append('label')
-				.attr('for', 'sbar_unit_radio_' + d.val + '_' + e.val)
+				.attr('for', 'sbar_sort_radio_' + d.val + '_' + e.val)
 				.text(d.name);
 		 });
-		 $('#sbar_unit_radio_' + e.val).buttonset()
-		 	.css('margin-left', '44px')
-		 	.change(function() { change_sbar_unit(e.val, $('.sbar_unit_radio_' + e.val + ':checked').val()); });
+		 $('#sbar_sort_radio_' + e.val).buttonset()
+		 	.css('margin-left', '14px')
+		 	.change(function() { change_sbar_sort(e.val, $('.sbar_sort_radio_' + e.val + ':checked').val()); });
 	});
 
-// change units
-	function change_sbar_unit(c, val) {
+// change sort
+	function change_sbar_sort(c, val) {
 		// update the settings
-			update_settings('sbar_unit', c, val);
+			update_settings('sbar_sort', c, val);
 		// update the charts
 			update_charts(c);
 	}
-	update_functions['sbar_unit'] = change_sbar_unit;
+	update_functions['sbar_sort'] = change_sbar_sort;
 
 
 // function to choose the correct value in a select menu

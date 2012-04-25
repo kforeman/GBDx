@@ -18,7 +18,7 @@
 			{ val: 'tree_risk',	label: 'Risk',		type: 'select',	section: 'tree' },
 			{ val: 'map_level',	label: 'Level',		type: 'select',	section: 'map' 	},
 			{ val: 'sbar_cat',	label: 'Risks',		type: 'select',	section: 'sbar'	},
-			{ val: 'sbar_unit',	label: 'Units',		type: 'radio',	section: 'sbar'	}
+			{ val: 'sbar_sort',	label: 'Sort',		type: 'radio',	section: 'sbar'	}
 		];
 
 // determine if this is the offline version
@@ -53,8 +53,8 @@
 		map_level_sync:	true,
 		sbar_cat_A:		'summary',
 		sbar_cat_sync:	true,
-		sbar_unit_A:	'rate',
-		sbar_unit_sync:	true
+		sbar_sort_A:	'rank',
+		sbar_sort_sync:	true
 	};
 
 // copy the default settings for A into the AB setting; also, make sure A & B are mirrored if synced
@@ -112,11 +112,11 @@
 	var AB = ['A', 'B'];
 
 // function for finding good tick formats
-	function tick_formatter(max) {
-		if (settings.unit == 'prop') {
+	function tick_formatter(max, unit) {
+		if (unit == 'prop') {
 			if (max <= .0005) return d3.format('.2%');
 			else if (max <= .005) return d3.format('.1%');
-			else if (max <= .05) return d3.format('.1%');
+			else if (max <= .1) return d3.format('.1%');
 			else return d3.format('.0%');
 		}
 		else {

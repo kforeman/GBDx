@@ -104,42 +104,24 @@
 
 // load risk proportions for a given geo/sex/metric/risk (for treemaps with risks)
 	function download_treemap_rf(geo, sex, metric, risk) {
-		if (use_mysql) {
-			$.ajax({
-				url: 'php/treemap_rfs.php?geo_sex=' + geo + '_' + sex + '&risk=' + risk + '&metric=' + metric,
-				dataType: 'json',
-				async: false,
-				success: function(json) {
-					if (json == "failure") loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
-					else {
-						json.map(function(d) {
-							treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
-						});
-						loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;					
-					}
-				},
-				error: function() {
-					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
-				}
-			});		
-		}
-		else {
-			$.ajax({
-				url: 'data/treemap_risks/' + geo + '_' + sex + '_' + risk + '_' + metric + '.csv',
-				dataType: 'text',
-				async: false,
-				success: function(csv) {
-					var data = d3.csv.parse(csv);
+		$.ajax({
+			url: use_mysql ? 'php/treemap_rfs.php?geo_sex=' + geo + '_' + sex + '&risk=' + risk + '&metric=' + metric : 'data/treemap_risks/' + geo + '_' + sex + '_' + risk + '_' + metric + '.csv',
+			dataType: use_mysql ? 'json' : 'text',
+			async: false,
+			success: function(data) {
+				if (data == "failure") loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+				if (!use_mysql) data = d3.csv.parse(data);
+				else {
 					data.map(function(d) {
 						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
 					});
-					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
-				},
-				error: function() {
-					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+					loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;					
 				}
-			});	
-		}
+			},
+			error: function() {
+				loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
+			}
+		});		
 	}
 
 // load risk values for a given geo/sex/metric/category (for stacked bar charts)
@@ -187,8 +169,6 @@
 		// return the result
 			return { values: bar_values, totals: bar_totals };
 	}
-
-
 
 // return a value in correct units (must already be downloaded)
 	function retrieve_value(metric, age, year, unit, geo, sex, cause) {
