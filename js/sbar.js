@@ -12,8 +12,8 @@
 // lookup full risk name based on variable name or vice versa
 	var risk_lookup = {};
 	risk_list.forEach(function(r) {
-		risk_lookup[r.risk] = 		{ 'short': r.risk_short, 'category': r.risk_level == 1 ? 'summary' : r.risk_parent, 'risk': r.risk };
-		risk_lookup[r.risk_short] = { 'short': r.risk_short, 'category': r.risk_level == 1 ? 'summary' : r.risk_parent, 'risk': r.risk };
+		risk_lookup[r.risk] = 		{ 'short': r.risk_short, 'category': r.risk_level == 1 ? 'summary' : r.risk_parent, 'risk': r.risk, 'name': r.risk_name };
+		risk_lookup[r.risk_short] = { 'short': r.risk_short, 'category': r.risk_level == 1 ? 'summary' : r.risk_parent, 'risk': r.risk, 'name': r.risk_name };
 	});
 
 // list of risks inside each category
@@ -74,7 +74,9 @@
 		risk_sbar_data = {},
 		risk_bar_thickness = {},
 		risk_stack_layout = {},
-		risk_sbar_rects = {};
+		risk_sbar_rects = {},
+		risk_back_button = {},
+		risk_sbar_label_rects = {};
 
 // function to find the risk value in the correct units when given a datum
 	function find_risk_sbar_value(d, age, year, geo, sex, unit, metric) {
@@ -182,7 +184,7 @@
 						height: risk_bar_thickness[c],
 						cause_color: lookups['cause'][e.cause_viz].cause_color,
 						tooltip: lookups['cause'][e.cause_viz].cause_name + '<br>' + 
-							risk_lookup[e.risk].short + ' attributable risk<br>' +
+							risk_lookup[e.risk].name + ' attributable risk<br>' +
 							tick_formatter(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c]), 'prop')(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c])) + ' of total ' + metric_list.filter(function(i) { return settings['metric_' + c] == i.val; })[0].short + '<br>' + 
 							d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'num', settings['metric_' + c]))) + ' ' + metric_list.filter(function(i) { return settings['metric_' + c] == i.val; })[0].short + unit_list['num'] + '<br>' +
 							'(' + d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'rate', settings['metric_' + c]))) + unit_list['rate'] + ' people)'
@@ -221,6 +223,54 @@
 			.attr('transform', 'translate(' + risk_left_pad + ',' + 0 + ')')
 			.attr('class', 'risk_y axis')
 			.call(risk_y_axis[c]);
+	
+	// draw (invisible) rectangles over the y axis to enable easier mouse interactions
+		risk_sbar_label_rects[c] = g.selectAll('risk_label_rects')
+			.data(risk_y_domain[c])
+		  .enter().append('rect')
+			.attr('x', 0)
+			.attr('width', risk_left_pad)
+			.attr('y', function(d) { return risk_y_scale[c](d) - risk_bar_thickness[c]/2; })
+			.attr('height', risk_bar_thickness[c])
+			.attr('class', 'risk_label_rect')
+			.attr('onclick', function(d) { return settings['sbar_cat_' + c] == 'summary' ? 'change_sbar_cat("' + c + '","' + risk_lookup[d].risk + '")' : '' })
+			.style('cursor', settings['sbar_cat_' + c] == 'summary' ? 'pointer' : 'default')
+			.attr('title', function(d) { return risk_lookup[d].name; });
+	
+	// add tooltips to the y axis labels
+		$('.risk_label_rect').poshytip({
+				slide: false, 
+				followCursor: true, 
+				alignTo: 'cursor', 
+				showTimeout: 0, 
+				hideTimeout: 0, 
+				alignX: 'center', 
+				alignY: 'inner-bottom', 
+				className: 'tip-twitter',
+				offsetY: 5
+		});
+	
+	// add a back button to return to the summary
+		risk_back_button[c] = g.append('text')
+			.text('?')
+			.attr('class', 'risk_back_button')
+			.attr('x', 20)
+			.attr('y', (height/2) - 10)
+			.attr('visibility', settings['sbar_cat_' + c] != 'summary' ? 'visible' : 'hidden')
+			.attr('onclick', 'change_sbar_cat("' + c + '","summary")')
+			.attr('title', 'Return to Risk Factor Summary.');
+		$('.risk_back_button').poshytip({
+				slide: false, 
+				followCursor: true, 
+				alignTo: 'cursor', 
+				showTimeout: 0, 
+				hideTimeout: 0, 
+				alignX: 'center', 
+				alignY: 'inner-bottom', 
+				className: 'tip-twitter',
+				offsetY: 5
+		});
+		
 	});
 	
 // update the chart
@@ -279,7 +329,7 @@
 						height: risk_bar_thickness[c],
 						cause_color: lookups['cause'][e.cause_viz].cause_color,
 						tooltip: lookups['cause'][e.cause_viz].cause_name + '<br>' + 
-							risk_lookup[e.risk].short + ' attributable risk<br>' +
+							risk_lookup[e.risk].name + ' attributable risk<br>' +
 							tick_formatter(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c]), 'prop')(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c])) + ' of total ' + metric_list.filter(function(i) { return settings['metric_' + c] == i.val; })[0].short + '<br>' + 
 							d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'num', settings['metric_' + c]))) + ' ' + metric_list.filter(function(i) { return settings['metric_' + c] == i.val; })[0].short + unit_list['num'] + '<br>' +
 							'(' + d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'rate', settings['metric_' + c]))) + unit_list['rate'] + ' people)'
@@ -326,6 +376,37 @@
 				className: 'tip-twitter',
 				offsetY: 5
 		});
+		
+	// show/hide back button
+		risk_back_button[c].attr('visibility', settings['sbar_cat_' + c] != 'summary' ? 'visible' : 'hidden');
+	
+	// update label rectangles
+		// remove old rectangles
+			risk_sbar_label_rects[c].remove();
+		// redraw the rectangles
+			risk_sbar_label_rects[c] = d3.select('#sbar_' + c).selectAll('risk_label_rects')
+				.data(risk_y_domain[c])
+			  .enter().append('rect')
+				.attr('x', 0)
+				.attr('width', risk_left_pad)
+				.attr('y', function(d) { return risk_y_scale[c](d) - risk_bar_thickness[c]/2; })
+				.attr('height', risk_bar_thickness[c])
+				.attr('class', 'risk_label_rect')
+				.attr('onclick', function(d) { return settings['sbar_cat_' + c] == 'summary' ? 'change_sbar_cat("' + c + '","' + risk_lookup[d].risk + '")' : '' })
+				.style('cursor', settings['sbar_cat_' + c] == 'summary' ? 'pointer' : 'default')
+				.attr('title', function(d) { return risk_lookup[d].name; });
+		// redraw tooltips
+			$('.risk_label_rect').poshytip({
+					slide: false, 
+					followCursor: true, 
+					alignTo: 'cursor', 
+					showTimeout: 0, 
+					hideTimeout: 0, 
+					alignX: 'center', 
+					alignY: 'inner-bottom', 
+					className: 'tip-twitter',
+					offsetY: 5
+			});
 	}
 
 // fill in the legend

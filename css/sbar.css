@@ -31,3 +31,13 @@
 	font-size:		12px;
 	text-anchor:	start;
 }
+
+.risk_label_rect {
+	opacity:		0;
+}
+
+.risk_back_button {
+	font-size:		32px;
+	cursor:			pointer;
+	color: 			#444;
+}

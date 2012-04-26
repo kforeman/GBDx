@@ -654,11 +654,14 @@
 	});
 
 // update the categories for the risk bars
+// note: treating AB differently here because the syncing is a bit unique in this case
 	function change_sbar_cat(c, val) {
 		// update the settings
-			update_settings('sbar_cat', c, val);
+			if (settings.sbar_cat_sync) update_settings('sbar_cat', 'AB', val);
+			else update_settings('sbar_cat', c, val);
 		// update the charts
-			update_charts(c);
+			if (settings.sbar_cat_sync) update_charts('AB');
+			else update_charts(c);
 	}
 	update_functions['sbar_cat'] = change_sbar_cat;
 
