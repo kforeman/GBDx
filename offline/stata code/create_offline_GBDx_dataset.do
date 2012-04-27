@@ -18,6 +18,8 @@ set more off
 set odbcmgr unixodbc
 global dsn CODMOD
 
+log using "${save_dir}/log", replace
+
 ** establish directories
 capture mkdir "${save_dir}"
 capture mkdir "${save_dir}/data"
