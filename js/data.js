@@ -127,7 +127,7 @@
 // load risk values for a given geo/sex/metric/category (for stacked bar charts)
 	function download_sbar_rf(geo, sex, metric, category) {
 		$.ajax({
-			url:	use_mysql ? 'php/sbar_rfs.php?geo_sex=' + geo + '_' + sex + '&metric=' + metric + '&category=' + category : 'data/sbar_risks/' + geo + '_' + sex + '_' + metric + '_' + cat + '.csv',
+			url:	use_mysql ? 'php/sbar_rfs.php?geo_sex=' + geo + '_' + sex + '&metric=' + metric + '&category=' + category : 'data/sbar_risks/' + geo + '_' + sex + '_' + category + '_' + metric + '.csv',
 			dataType:	use_mysql ? 'json' : 'text',
 			async:		false,
 			success:	function(data) {
