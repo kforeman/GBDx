@@ -23,6 +23,7 @@ log using "${save_dir}/log", replace
 ** establish directories
 capture mkdir "${save_dir}"
 capture mkdir "${save_dir}/data"
+capture mkdir "${save_dir}/logs"
 foreach subdir in parameters pops treemap map treemap_risks sbar_risks {
 	capture mkdir "${save_dir}/data/`subdir'"
 }
