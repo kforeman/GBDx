@@ -17,8 +17,7 @@ cap log close
 log using "${save_dir}/logs/save_map_${cause}_${sex}.smcl", replace
 
 ** open data and save relevant part
-use "${tmp_dir}/all_cfs.dta", clear
-quietly keep if cause_viz == "${cause}" & substr(geo_sex, -1, 1) == "${sex}"
+use if cause_viz == "${cause}" & substr(geo_sex, -1, 1) == "${sex}" using "${tmp_dir}/all_cfs.dta", clear
 foreach m of global metrics {
 	di "`m'"
 	renpfix `m'_m_ m

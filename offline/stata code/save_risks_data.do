@@ -17,14 +17,16 @@ cap log close
 log using "${save_dir}/logs/save_risks_${geo_sex}.smcl", replace
 
 ** open data and save relevant part
-use "${tmp_dir}/all_rfs.dta", clear
+use if geo_sex == "${geo_sex}" using "${tmp_dir}/all_rfs.dta", clear
+preserve
 foreach r of global risks {
 	di "`r'"
-	quietly keep if geo_sex == "${geo_sex}" & risk == "`r'"
+	quietly keep if risk == "`r'"
 	foreach m of global metrics {
 		di "`m'"
 		renpfix `m'_ m
 		outsheet cause_viz risk m* using "${save_dir}/data/treemap_risks/${geo_sex}_`r'_`m'.csv", comma replace
 		drop m*
 	}
+	restore, preserve
 }

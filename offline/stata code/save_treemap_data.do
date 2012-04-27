@@ -17,8 +17,7 @@ cap log close
 log using "${save_dir}/logs/save_treemap_${geo_sex}.smcl", replace
 
 ** open data and save relevant part
-use "${tmp_dir}/all_cfs.dta", clear
-quietly keep if geo_sex == "${geo_sex}" 
+use if geo_sex == "${geo_sex}" using "${tmp_dir}/all_cfs.dta", clear
 foreach m of global metrics {
 	di "`m'"
 	renpfix `m'_m_ m
