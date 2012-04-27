@@ -160,6 +160,6 @@ foreach g of local geo_sexes {
 							"#$ -S /bin/sh" _n ///
 							`"/usr/local/stata11/stata-mp < "${tmp_dir}/save_sbar_risks_`g'.do" > /dev/null"' _n
 	file close shell_script
-	! /usr/local/bin/SGE/bin/lx24-amd64/qsub -l mem_free=4G -N r`g' "${tmp_dir}/save_sbar_risks_`g'.sh"
+	! /usr/local/bin/SGE/bin/lx24-amd64/qsub -l mem_free=4G -N rb`g' "${tmp_dir}/save_sbar_risks_`g'.sh"
 	sleep 100
 }
