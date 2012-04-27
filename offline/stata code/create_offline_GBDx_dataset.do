@@ -29,7 +29,6 @@ foreach subdir in parameters pops treemap map treemap_risks sbar_risks {
 }
 global tmp_dir "/share/temp/save_GBDx_data"
 capture mkdir "${tmp_dir}"
-
 ** ages
 odbc load, exec("SELECT * FROM gbdx_age ORDER BY age_viz;") dsn($dsn) clear
 outsheet using "${save_dir}/data/parameters/age_list.csv", comma replace
@@ -58,11 +57,11 @@ tempfile risk_parents
 save `risk_parents', replace
 	
 ** populations
-odbc load, exec("SELECT * FROM gbdx_pops;") dsn($dsn) clear
+odbc load, exec("SELECT * FROM gbdx_pop;") dsn($dsn) clear
 outsheet using "${save_dir}/data/pops/pop.csv", comma replace
 
 ** treemap starting values
-odbc load, exec("SELECT cause_viz, AVG(daly_m_22_3) AS treemap_start_val FROM gbdx_cfs WHERE geo_sex='G_M' OR geo_sex='G_F' GROUP BY (cause_viz);") clear
+odbc load, exec("SELECT cause_viz, AVG(daly_m_pc_22_3) AS treemap_start_val FROM gbdx_cfs WHERE geo_sex='G_M' OR geo_sex='G_F' GROUP BY (cause_viz);") clear
 outsheet using "${save_dir}/data/treemap/treemap_starting_values.csv", comma replace
 
 ** all cause fractions
@@ -105,7 +104,7 @@ foreach g of local geo_sexes {
 	! /usr/local/bin/SGE/bin/lx24-amd64/qsub -l mem_free=4G -N tm`g' "${tmp_dir}/save_treemap_`g'.sh"
 	sleep 100
 }
-	
+
 ** map data
 foreach c of local cause_vizes {
 	foreach s of local sexes {
