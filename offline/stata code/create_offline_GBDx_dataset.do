@@ -20,6 +20,7 @@ global dsn CODMOD
 
 ** establish directories
 capture mkdir "${save_dir}"
+capture mkdir "${save_dir}/data"
 foreach subdir in parameters pops treemap map treemap_risks sbar_risks {
 	capture mkdir "${save_dir}/data/`subdir'"
 }
