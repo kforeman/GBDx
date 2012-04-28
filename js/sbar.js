@@ -251,11 +251,13 @@
 		});
 	
 	// add a back button to return to the summary
-		risk_back_button[c] = g.append('text')
-			.text('?')
-			.attr('class', 'risk_back_button')
+		risk_back_button[c] = g.append('image')
+			.attr('xlink:href', 'resources/arrow.png')
 			.attr('x', 20)
-			.attr('y', (height/2) - 10)
+			.attr('class', 'risk_back_button')
+			.attr('y', (height/2) - 25)
+			.attr('width', 31)
+			.attr('height', 13)
 			.attr('visibility', settings['sbar_cat_' + c] != 'summary' ? 'visible' : 'hidden')
 			.attr('onclick', 'change_sbar_cat("' + c + '","summary")')
 			.attr('title', 'Return to Risk Factor Summary.');
