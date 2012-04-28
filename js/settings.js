@@ -22,7 +22,7 @@
 		];
 
 // determine if this is the offline version
-	var use_mysql = (window.location.host != 'localhost:8888');
+	var use_mysql = (window.location.host != '');
 
 // create some default settings
 	var defaults = {
