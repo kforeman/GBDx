@@ -39,5 +39,6 @@
 .risk_back_button {
 	font-size:		32px;
 	cursor:			pointer;
-	color: 			#444;
+	fill: 			#555;
+	font-family:	arial,sans-serif;
 }
