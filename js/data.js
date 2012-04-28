@@ -110,8 +110,8 @@
 			async: false,
 			success: function(data) {
 				if (data == "failure") loaded_treemap_rfs[geo + '_' + sex + '_' + metric + '_' + risk] = 1;
-				if (!use_mysql) data = d3.csv.parse(data);
 				else {
+					if (!use_mysql) data = d3.csv.parse(data);
 					data.map(function(d) {
 						treemap_rfs[geo][sex][metric][risk][d.cause_viz] = d;
 					});
