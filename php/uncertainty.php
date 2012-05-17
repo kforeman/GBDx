@@ -35,6 +35,6 @@
     	$rows[] = $row;
     
     // return the results
-	if (count($rows)) echo json_encode($rows);
+	if (count($rows)) echo json_encode($rows, JSON_NUMERIC_CHECK);
 	else echo '"failure"';
 ?>

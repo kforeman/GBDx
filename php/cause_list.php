@@ -18,6 +18,6 @@
     	$rows[] = $row;
 		
 	// return the results in json format
-	if (count($rows)) echo json_encode($rows);
+	if (count($rows)) echo json_encode($rows, JSON_NUMERIC_CHECK);
 	else echo '"failure"';
 ?>

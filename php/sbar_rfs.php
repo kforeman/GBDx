@@ -47,7 +47,7 @@
     	$rows[] = $row;
     
     // return the results
-	if (count($rows)) echo json_encode($rows);
+	if (count($rows)) echo json_encode($rows, JSON_NUMERIC_CHECK);
 	else echo '"failure"';
 	// else echo 'SELECT cause_viz,geo_sex,risk,'.$columns.' FROM gbdx_rfs WHERE geo_sex="'.$geo_sex.'" AND ('.$cause_clause.') AND ('.$risk_clause.');';
 ?>
