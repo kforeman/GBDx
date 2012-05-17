@@ -227,6 +227,7 @@
 			dataType: 'json',
 			async: false,
 			success: function(json) {
+				// add the upper and lower values as new properties to the already existing mean value
 				$.extend(estimates[geo][sex][metric][cause], json[0]);
 				loaded_uncertainty[geo + '_' + sex + '_' + metric + '_' + cause] = 1;
 			}
