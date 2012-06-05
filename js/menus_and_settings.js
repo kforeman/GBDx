@@ -190,7 +190,7 @@
 // NOTE: for public launch, create an IHME account and then wrap this up in some php or something so that the API key is not public
 	function bitlify() {
 		$.ajax({
-			url: 		'http://api.bitly.com/v3/shorten?callback=?',
+			url: 		'https://api-ssl.bitly.com/v3/shorten?callback=?',
 			dataType:	'json',
 			data: 		{
 				format:	'json',
