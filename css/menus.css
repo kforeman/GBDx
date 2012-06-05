@@ -1,0 +1,86 @@
+#top_menu_div {
+	width:				100%;
+	background:			#48AA43;
+}
+
+#top_menu_div  img {
+	margin: 			5px 0px 0px 5px;
+}
+
+.top_menu_button {
+	float:				right;
+	font-size:			12px;
+	margin-right:		5px;
+	margin-top:			7px;
+}
+
+.dialog_menu {	
+	font-size:			12px;
+}
+
+* {
+	outline:			none;
+}
+
+
+.menu_element_title {
+	clear:				both;
+	font-weight:		bold;
+}
+
+.ui-tabs-panel {
+	padding: 			3px !important;
+}
+
+.menu_lock_button {
+	width:				15px;
+	height:				15px;
+}
+
+.menu_lock_button span {
+	left:				-1px !important;
+}
+
+.menu_lock_td {
+	width:				8%;
+	padding-top:		2px;
+}
+
+.menu_table, .menu_subtable {
+	width: 				100%;
+}
+
+#lower_div {
+	overflow:			none;
+}
+
+#side_menu_panel {
+	font-size:			12px;
+	position:			absolute;
+}
+
+#split_screen_line {
+	stroke: 			#444;
+	fill:				none;
+	shape-rendering:	crispEdges;
+}
+
+.ui-slider {
+	border:				1px solid #AAA !important;
+}
+
+.menu_slider {
+	width:				69%;
+}
+
+.menu_slider_label {
+	width:				29%;
+	padding-left:		6px;
+	font-size:			12px;
+}
+
+.menu_radio_label .ui-button-text {
+	font-size:			12px;
+	padding:			1px 8px;
+}
+

@@ -1,21 +1,11 @@
 /*	Author:		Kyle Foreman (kforeman@post.harvard.edu)
-	Date:		10 January 2012
-	Purpose:	Create the geographic map
+	Date:		5 June 2012
+	Purpose:	Create the choropleth map
 */
 
 // create the map projection
 	var map_proj = d3.geo.mercator().scale(775).translate([360, 220]),
 		map_coord = d3.geo.path().projection(map_proj);
-
-// create interpolators for the choropleth
-	var map_interpolators = [];
-	for (i=0; i<10; i++) {
-		map_interpolators.push(d3.interpolate(colorbrewer['Spectral'][11][i], colorbrewer['Spectral'][11][i+1]));
-	}
-	function choropleth_color(val) {
-		if (isNaN(val)) return '#cccccc';
-		else return map_interpolators[Math.floor(val)](val - Math.floor(val));
-	}
 
 // make a lookup for country names/regions
 	lookups['geo'] = {};
@@ -38,14 +28,13 @@
 		map_color_scales = {},
 		map_highlights = {};
 
-// loop through sections A and B
-	AB.map(function(c) {
+// loop through canvases
+	canvas_data.forEach(function(canvas) {
+		var c = canvas.canvas;
 		
 	// add a g for this map
-		g = d3.select('#' + c)
-		  .append('g')
-		  	.attr('id', 'map_' + c)
-		  	.attr('transform', 'translate(' + (settings['chart_' + c] == 'map' ? content_buffer : -1 * content_width) + ',' + content_buffer + ')');
+		var g = d3.select('#map_' + c)
+		  	.attr('transform', 'translate(0,' + (c == 0 ? height/4 : 0) + ')');
 	
 	// draw the map
 		map_paths[c] = g.selectAll('map_paths')
@@ -60,48 +49,58 @@
 		  	.attr('title', function(d) { return lookups['geo'][d.id] ? lookups['geo'][d.id].name : 'No Data'; });
 	
 	// draw a highlight layer
-		map_highlights[c] = g.selectAll('map_highlights')
-			.data(geojson_map.features)
-		  .enter().append('path')
-		  	.attr('d', map_coord)
-		  	.attr('class', 'map_highlight')
-		  	.style('stroke-opacity', 1e-6);
+		map_highlights[c] = g.append('path')
+		  	.attr('d', map_coord(geojson_map.features.filter(function(d) { return d.id == settings['geo_' + c]; } )[0]))
+		  	.attr('class', 'map_highlight');
+			
+	// create the scale
+		map_color_scales[c] = d3.scale.linear()
+			.domain(d3.range(1, -1e-5, -1/11))
+			.range(colorbrewer['Spectral'][11])
+			.clamp(true);
 	
 	// draw a legend
 		g.append('g')
-			.attr('transform', 'translate(250, 330)')
+			.attr('transform', 'translate(250, 345)')
  		  .selectAll('.color_bar')
 			.data(d3.range(300))
 		  .enter().append('rect')
 			.attr('x', function(d) { return d + 'px'; })
 			.attr('width', '1px')
-			.attr('height', '12px')
+			.attr('height', '10px')
 			.attr('y', '0px')
-			.attr('fill', function(d) { return choropleth_color((299-d)/30); })
+			.attr('fill', function(d) { return map_color_scales[c](d/299); })
 			.attr('stroke', 'none');
 	
 	// label the legend
 		map_legend_scales[c] = d3.scale.linear().range([250, 550]);
-		map_legend_axes[c] = d3.svg.axis().scale(map_legend_scales[c]).ticks(4).orient('bottom').tickSize(5);
+		map_legend_axes[c] = d3.svg.axis().scale(map_legend_scales[c]).ticks(6).orient('bottom').tickSize(5);
 		map_legend_labels[c] = g.append('g')
-			.attr('transform', 'translate(0, 345)')
+			.attr('transform', 'translate(0, 356)')
 			.attr('class', 'map axis')
 			.call(map_legend_axes[c]);
 	
 	// title the legend
-		map_legend_titles[c] = g.append('text')
+		map_legend_titles[c + '_cause_risk'] = g.append('text')
 			.attr('dx', 400)
-			.attr('dy', 320)
+			.attr('dy', 316)
 			.attr('class', 'map_legend_title')
-			.text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + unit_list[settings['unit_' + c]]);
-			
-	// create the scale
-		map_color_scales[c] = d3.scale.linear().range([10-1e-6, 1e-6]).clamp(true);
+			.text(lookups.cause[settings['cause_' + c]].cause_short);
+		map_legend_titles[c + '_age_sex'] = g.append('text')
+			.attr('dx', 400)
+			.attr('dy', 329)
+			.attr('class', 'map_legend_title')
+			.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
+		map_legend_titles[c + '_units'] = g.append('text')
+			.attr('dx', 400)
+			.attr('dy', 342)
+			.attr('class', 'map_legend_title')
+			.text(lookups.metric_labels[settings['metric_' + c]] + lookups.unit_labels[settings['unit_' + c]]);
 	});
 
 // function to change geo when map is clicked
 	function map_change_geo(new_geo, c) {
-		if (settings['map_click'] && typeof lookups['geo'][new_geo] != 'undefined') change_geo('AB', lookups['geo'][new_geo][settings['map_level_' + c]]);
+		if (typeof lookups['geo'][new_geo] != 'undefined') change_geo(lookups['geo'][new_geo][settings['map_level_' + c]], c);
 	}
 
 // add tooltips on mouseover
@@ -118,7 +117,7 @@
 	});
 
 // function to update the map
-	var current_map_level = { 'A': '', 'B': '' };
+	var current_map_level = { 0: '', 1: '', 2: '' };
 	function refresh_map(c) {
 	
 	// find the parameters for this map
@@ -133,7 +132,7 @@
 			map_level = settings['map_level_' + c];
 		
 	// only if this chart is selected, update it
-		if (chart == 'map') {
+		if (chart_visibility['map_' + c]) {
 	
 		// load in the data for this cause/sex
 			retrieve_map_data(cause, sex, metric);
@@ -151,38 +150,32 @@
 			var map_max = d3.max(map_vals);
 		
 		// update the legend
-			map_legend_axes[c].scale(map_legend_scales[c].domain([0, map_max]));
+			map_legend_axes[c].scale(map_legend_scales[c].domain([0, map_max]))
+				.tickFormat(tick_formatter(map_max, settings['unit_' + c]));
 			map_legend_labels[c].transition().duration(1000).call(map_legend_axes[c]);
 		
 		// update the legend title
-			map_legend_titles[c]
-				.text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + unit_list[settings['unit_' + c]]);
+			map_legend_titles[c + '_cause_risk']
+				.text(lookups.cause[settings['cause_' + c]].cause_short);
+			map_legend_titles[c + '_age_sex']
+				.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
+			map_legend_titles[c + '_units']
+				.text(lookups.metric_labels[settings['metric_' + c]] + lookups.unit_labels[settings['unit_' + c]]);
 			
 		// color in the choropleth
-			map_color_scales[c].domain([0, map_max]);
+			map_color_scales[c].domain(d3.range(map_max*1.01, 0, -map_max/11));
 			map_paths[c].transition()
 				.duration(1000)
 				.style('fill', function(d) {
 					var g = lookups['geo'][d.id] ? lookups['geo'][d.id][map_level] : '',
 						val = retrieve_value(metric, age, year, unit, g, sex, cause);
 					if (isNaN(val)) return '#ccc';
-					else return choropleth_color(map_color_scales[c](val));	
+					else return map_color_scales[c](val);	
 				});
 		
 		// highlight the selected country
-			map_highlights[c].transition()
-				.duration(1000)
-				.style('stroke-opacity', function(d) {
-				 	var	g = lookups['geo'][d.id]
-						gg = lookups['geo'][geo];
-					if (typeof g != 'undefined') {
-						if (g[gg.level] == geo) return 1;
-						else return 1e-6;
-					}
-					else {
-						return 1e-6;
-					}
-				});
+			map_highlights[c]
+				.attr('d', map_coord(geojson_map.features.filter(function(d) { return d.id == settings['geo_' + c]; } )[0]));
 		
 		// change the mouseover if we've changed levels
 			if (current_map_level[c] != map_level) {
@@ -212,3 +205,7 @@
 		current_map_level[c] = map_level;
 		}
 	}
+	menus_012.forEach(function(c) {
+		refresh_map(c);
+	});
+	

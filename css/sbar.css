@@ -5,7 +5,6 @@
 
 .risk_y.axis text {
 	fill: 			#444;
-	text-shadow: 	none;
 	font-size: 		12px;
 }
 
@@ -16,18 +15,17 @@
 
 .risk_x.axis text {
 	fill: 			#444;
-	text-shadow: 	none;
 	font-size:	 	12px;
 }
 
 .sbar_rect {
 	stroke: 		#fff;
 	stroke-width:	1px;
+	shape-rendering:crispEdges;
 }
 
 .sbar_legend {
 	fill:			#444;
-	text-shadow:	none;
 	font-size:		12px;
 	text-anchor:	start;
 }

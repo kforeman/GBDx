@@ -1,11 +1,11 @@
 /*	Author:		Kyle Foreman (kforeman@post.harvard.edu)
-	Date:		18 April 2012
+	Date:		5 June 2012
 	Purpose:	Make stacked bar graphs of risk factor attributions
 */
 
 // spacing variables
 	var risk_top_pad = 10,
-		risk_left_pad = 120,
+		risk_left_pad = 125,
 		risk_bottom_pad = 40,
 		risk_right_pad = 22;
 	
@@ -89,21 +89,19 @@
 		}
 	}
 
-// loop through sections A and B
-	AB.forEach(function(c) {
+// loop through canvases
+	canvas_data.forEach(function(canvas) {
+		var c = canvas.canvas;
 		
-	// add a g for this plot
-		g = d3.select('#' + c)
-		  .append('g')
-		  	.attr('id', 'sbar_' + c)
-		  	.attr('transform', 'translate(' + (settings['chart_' + c] == 'sbar' ? content_buffer : -1 * content_width) + ',' + content_buffer + ')');
+	// select the g for this plot
+		g = d3.select('#sbar_' + c);
 
 	// load in the data for this chart
-		risk_sbar_data[c] = retrieve_sbar_rf(settings['geo_' + c], settings['sex_' + c], settings['metric_' + c], settings['sbar_cat_' + c]);
+		risk_sbar_data[c] = retrieve_sbar_rf(settings['geo_' + c], settings['sex_' + c], settings['metric_' + c], settings['risk_cat_' + c]);
 	
 	// put the risks in the correct order
 		risk_y_domain[c] = [];
-		risk_names_by_cat[settings['sbar_cat_' + c]].forEach(function(r) {
+		risk_names_by_cat[settings['risk_cat_' + c]].forEach(function(r) {
 			risk_y_domain[c].push(r);
 		});
 		if (settings['sbar_sort_' + c] == 'alpha') risk_y_domain[c].sort();
@@ -114,30 +112,30 @@
 		}	
 	
 	// build the y axis (list of risks)
-		risk_y_scale[c] = d3.scale.ordinal().domain(risk_y_domain[c]).rangePoints([risk_top_pad, height/2 - risk_bottom_pad], 1),
+		risk_y_scale[c] = d3.scale.ordinal().domain(risk_y_domain[c]).rangePoints([risk_top_pad, height * (c == 0 ? 1 : .5) - risk_bottom_pad], 1),
 		risk_y_axis[c] = d3.svg.axis().scale(risk_y_scale[c])
 			.orient('left').tickSize(5);
 	
 	// figure out appropriate bar thickness
-		risk_bar_thickness[c] = d3.round((height/2 - risk_top_pad - risk_bottom_pad) / (risk_names_by_cat[settings['sbar_cat_' + c]].length + 1) * .8);
+		risk_bar_thickness[c] = d3.round((height * (c == 0 ? 1 : .5) - risk_top_pad - risk_bottom_pad) / (risk_names_by_cat[settings['risk_cat_' + c]].length + 1) * .8);
 	
 	// build the x axis
 		risk_x_scale[c] = d3.scale.linear().range([0, content_width - risk_right_pad - risk_left_pad]);
 		risk_x_axis[c] = d3.svg.axis().scale(risk_x_scale[c])
 			.orient('bottom').tickSize(5);
 		risk_x_labels[c] = g.append('g')
-			.attr('transform', 'translate(' + risk_left_pad + ',' + (height/2 - risk_bottom_pad) + ')')
+			.attr('transform', 'translate(' + risk_left_pad + ',' + (height * (c == 0 ? 1 : .5) - risk_bottom_pad) + ')')
 			.attr('class', 'risk_x axis')
 			.call(risk_x_axis[c]);
 	
 	// add x axis title
 		risk_x_title[c] = g.append('text')
 			.attr('dx', risk_left_pad + risk_x_scale[c](.5))
-			.attr('dy', height/2 - 10)
+			.attr('dy', height * (c == 0 ? 1 : .5) - 10)
 			.style('fill', '#555')
 			.style('font-weight', 'bold')
 			.style('font-size', '14px')
-			.text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + unit_list[settings['unit_' + c]]);
+			.text(lookups.metric_labels[settings['metric_' + c]] + lookups.unit_labels[settings['unit_' + c]]);
 	
 	// set the x scale for the plot
 		var tmp_max = [];
@@ -233,8 +231,8 @@
 			.attr('y', function(d) { return risk_y_scale[c](d) - risk_bar_thickness[c]/2; })
 			.attr('height', risk_bar_thickness[c])
 			.attr('class', 'risk_label_rect')
-			.attr('onclick', function(d) { return settings['sbar_cat_' + c] == 'summary' ? 'change_sbar_cat("' + c + '","' + risk_lookup[d].risk + '")' : '' })
-			.style('cursor', settings['sbar_cat_' + c] == 'summary' ? 'pointer' : 'default')
+			.attr('onclick', function(d) { return settings['risk_cat_' + c] == 'summary' ? 'change_risk_cat("' + risk_lookup[d].risk + '",' + c + ')' : '' })
+			.style('cursor', settings['risk_cat_' + c] == 'summary' ? 'pointer' : 'default')
 			.attr('title', function(d) { return risk_lookup[d].name; });
 	
 	// add tooltips to the y axis labels
@@ -255,11 +253,11 @@
 			.attr('xlink:href', 'resources/arrow.png')
 			.attr('x', 20)
 			.attr('class', 'risk_back_button')
-			.attr('y', (height/2) - 25)
+			.attr('y', (height * (c == 0 ? 1 : .5)) - 25)
 			.attr('width', 31)
 			.attr('height', 13)
-			.attr('visibility', settings['sbar_cat_' + c] != 'summary' ? 'visible' : 'hidden')
-			.attr('onclick', 'change_sbar_cat("' + c + '","summary")')
+			.attr('visibility', settings['risk_cat_' + c] != 'summary' ? 'visible' : 'hidden')
+			.attr('onclick', 'change_risk_cat("summary",' + c + ')')
 			.attr('title', 'Return to Risk Factor Summary.');
 		$('.risk_back_button').poshytip({
 				slide: false, 
@@ -277,128 +275,98 @@
 	
 // update the chart
 	function refresh_sbar(c) {
+		if (chart_visibility['sbar_' + c]) { 
 	
-	// update the data
-		risk_sbar_data[c] = retrieve_sbar_rf(settings['geo_' + c], settings['sex_' + c], settings['metric_' + c], settings['sbar_cat_' + c]);
-	
-	// update the y scale
-		risk_y_domain[c] = [];
-		risk_names_by_cat[settings['sbar_cat_' + c]].forEach(function(r) {
-			risk_y_domain[c].push(r);
-		});
-		if (settings['sbar_sort_' + c] == 'alpha') risk_y_domain[c].sort();
-		else if (settings['sbar_sort_' + c] == 'rank') {
-			risk_y_domain[c].sort(function(a,b) {
-				return parseFloat(risk_sbar_data[c]['totals'].filter(function(d) { return d.risk == risk_lookup[b].risk; })[0]['mnm_' + settings['age_' + c] + '_' + settings['year_' + c]]) - parseFloat(risk_sbar_data[c]['totals'].filter(function(d) { return d.risk == risk_lookup[a].risk; })[0]['mnm_' + settings['age_' + c] + '_' + settings['year_' + c]]);
-			});
-		}
-		risk_y_scale[c].domain(risk_y_domain[c]);
-		risk_y_axis[c].scale(risk_y_scale[c]);
-		risk_y_labels[c].transition().duration(1000).ease('linear').call(risk_y_axis[c]);
-		risk_bar_thickness[c] = d3.round((height/2 - risk_top_pad - risk_bottom_pad) / (risk_names_by_cat[settings['sbar_cat_' + c]].length + 1) * .8);
-	
-	// update the x axis
-		var tmp_max = [];
-		year_list.forEach(function(y) {
-			risk_sbar_data[c]['totals'].forEach(function(d) {
-				tmp_max.push(find_risk_sbar_value(d, settings['age_' + c], y.year_viz, settings['geo_' + c], settings['sex_' + c], settings['unit_' + c], settings['metric_' + c]));
-			});
-		});
-		risk_x_scale[c].domain([0, d3.max(tmp_max)]);
-		risk_x_axis[c].scale(risk_x_scale[c])
-			.tickFormat(tick_formatter(d3.max(tmp_max), settings['unit_' + c]));
-		risk_x_labels[c].transition().duration(1000).call(risk_x_axis[c]);
-		risk_x_title[c].text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + unit_list[settings['unit_' + c]]);
-	
-	// update layout function y-lookup
-		risk_stack_layout[c]
-			.y(function(d) { 
-				return typeof d == 'undefined' 
-					? 0 
-					: risk_x_scale[c](find_risk_sbar_value(d, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], settings['unit_' + c], settings['metric_' + c])); 
-			});	
-	
-	// update the data array
-		risk_sbar_data[c]['flat'] = [];
-		risk_stack_layout[c](risk_sbar_data[c]['values']).forEach(function(d) {
-			d.forEach(function(e) {
-				if (typeof e != 'undefined') {
-					risk_sbar_data[c]['flat'].push({ 
-						cause_risk: e.cause_viz + '_' + e.risk, 
-						y: risk_y_scale[c](risk_lookup[e.risk]['short']) - risk_bar_thickness[c]/2, 
-						x: e.y0 + risk_left_pad, 
-						width: e.y < 0 ? 0 : e.y, 
-						height: risk_bar_thickness[c],
-						cause_color: lookups['cause'][e.cause_viz].cause_color,
-						tooltip: lookups['cause'][e.cause_viz].cause_name + '<br>' + 
-							risk_lookup[e.risk].name + ' attributable risk<br>' +
-							tick_formatter(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c]), 'prop')(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c])) + ' of total ' + metric_list.filter(function(i) { return settings['metric_' + c] == i.val; })[0].short + '<br>' + 
-							d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'num', settings['metric_' + c]))) + ' ' + metric_list.filter(function(i) { return settings['metric_' + c] == i.val; })[0].short + unit_list['num'] + '<br>' +
-							'(' + d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'rate', settings['metric_' + c]))) + unit_list['rate'] + ' people)'
-					});
-				}
-			});
-		});
-	
-	// update the rectangles
-		// rebind the data
-			risk_sbar_rects[c] = risk_sbar_rects[c]
-				.data(risk_sbar_data[c]['flat'], function(d) { return d.cause_risk; });
-		// insert new rectangles
-			risk_sbar_rects[c]
-  			  .enter().insert('rect', '.risk_y.axis')
-				.attr('x', risk_left_pad)
-				.attr('y', function(d) { return d.y; })
-				.attr('title', function(d) { return d.tooltip; })
-				.attr('width', 0)
-				.attr('height', function(d) { return d.height; })
-				.style('fill', function(d) { return sbar_color_lookup[d.cause_color]; })
-				.attr('class', 'sbar_rect');
-		// update existing rectangles
-			risk_sbar_rects[c]
-				.attr('title', function(d) { return d.tooltip; })
-			  .transition().ease('linear').duration(1000)
-				.attr('x', function(d) { return d.x; })
-				.attr('y', function(d) { return d.y; })
-				.attr('width', function(d) { return d.width; })
-				.attr('height', function(d) { return d.height; });
-		// remove rectangles that no longer exist
-			risk_sbar_rects[c]
-			  .exit().transition().duration(500).style('opacity', 1e-6).remove();
-
-	// update tooltips
-		$('.sbar_rect').poshytip({
-				slide: false, 
-				followCursor: true, 
-				alignTo: 'cursor', 
-				showTimeout: 0, 
-				hideTimeout: 0, 
-				alignX: 'center', 
-				alignY: 'inner-bottom', 
-				className: 'tip-twitter',
-				offsetY: 5
-		});
+		// update the data
+			risk_sbar_data[c] = retrieve_sbar_rf(settings['geo_' + c], settings['sex_' + c], settings['metric_' + c], settings['risk_cat_' + c]);
 		
-	// show/hide back button
-		risk_back_button[c].attr('visibility', settings['sbar_cat_' + c] != 'summary' ? 'visible' : 'hidden');
-	
-	// update label rectangles
-		// remove old rectangles
-			risk_sbar_label_rects[c].remove();
-		// redraw the rectangles
-			risk_sbar_label_rects[c] = d3.select('#sbar_' + c).selectAll('risk_label_rects')
-				.data(risk_y_domain[c])
-			  .enter().append('rect')
-				.attr('x', 0)
-				.attr('width', risk_left_pad)
-				.attr('y', function(d) { return risk_y_scale[c](d) - risk_bar_thickness[c]/2; })
-				.attr('height', risk_bar_thickness[c])
-				.attr('class', 'risk_label_rect')
-				.attr('onclick', function(d) { return settings['sbar_cat_' + c] == 'summary' ? 'change_sbar_cat("' + c + '","' + risk_lookup[d].risk + '")' : '' })
-				.style('cursor', settings['sbar_cat_' + c] == 'summary' ? 'pointer' : 'default')
-				.attr('title', function(d) { return risk_lookup[d].name; });
-		// redraw tooltips
-			$('.risk_label_rect').poshytip({
+		// update the y scale
+			risk_y_domain[c] = [];
+			risk_names_by_cat[settings['risk_cat_' + c]].forEach(function(r) {
+				risk_y_domain[c].push(r);
+			});
+			if (settings['sbar_sort_' + c] == 'alpha') risk_y_domain[c].sort();
+			else if (settings['sbar_sort_' + c] == 'rank') {
+				risk_y_domain[c].sort(function(a,b) {
+					return parseFloat(risk_sbar_data[c]['totals'].filter(function(d) { return d.risk == risk_lookup[b].risk; })[0]['mnm_' + settings['age_' + c] + '_' + settings['year_' + c]]) - parseFloat(risk_sbar_data[c]['totals'].filter(function(d) { return d.risk == risk_lookup[a].risk; })[0]['mnm_' + settings['age_' + c] + '_' + settings['year_' + c]]);
+				});
+			}
+			risk_y_scale[c].domain(risk_y_domain[c]);
+			risk_y_axis[c].scale(risk_y_scale[c]);
+			risk_y_labels[c].transition().duration(1000).ease('linear').call(risk_y_axis[c]);
+			risk_bar_thickness[c] = d3.round((height * (c == 0 ? 1 : .5) - risk_top_pad - risk_bottom_pad) / (risk_names_by_cat[settings['risk_cat_' + c]].length + 1) * .8);
+		
+		// update the x axis
+			var tmp_max = [];
+			year_list.forEach(function(y) {
+				risk_sbar_data[c]['totals'].forEach(function(d) {
+					tmp_max.push(find_risk_sbar_value(d, settings['age_' + c], y.year_viz, settings['geo_' + c], settings['sex_' + c], settings['unit_' + c], settings['metric_' + c]));
+				});
+			});
+			risk_x_scale[c].domain([0, d3.max(tmp_max)]);
+			risk_x_axis[c].scale(risk_x_scale[c])
+				.tickFormat(tick_formatter(d3.max(tmp_max), settings['unit_' + c]));
+			risk_x_labels[c].transition().duration(1000).call(risk_x_axis[c]);
+			risk_x_title[c].text(lookups.metric_labels[settings['metric_' + c]] + lookups.unit_labels[settings['unit_' + c]]);
+		
+		// update layout function y-lookup
+			risk_stack_layout[c]
+				.y(function(d) { 
+					return typeof d == 'undefined' 
+						? 0 
+						: risk_x_scale[c](find_risk_sbar_value(d, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], settings['unit_' + c], settings['metric_' + c])); 
+				});	
+		
+		// update the data array
+			risk_sbar_data[c]['flat'] = [];
+			risk_stack_layout[c](risk_sbar_data[c]['values']).forEach(function(d) {
+				d.forEach(function(e) {
+					if (typeof e != 'undefined') {
+						risk_sbar_data[c]['flat'].push({ 
+							cause_risk: e.cause_viz + '_' + e.risk, 
+							y: risk_y_scale[c](risk_lookup[e.risk]['short']) - risk_bar_thickness[c]/2, 
+							x: e.y0 + risk_left_pad, 
+							width: e.y < 0 ? 0 : e.y, 
+							height: risk_bar_thickness[c],
+							cause_color: lookups['cause'][e.cause_viz].cause_color,
+							tooltip: lookups['cause'][e.cause_viz].cause_name + '<br>' + 
+								risk_lookup[e.risk].name + ' attributable risk<br>' +
+								tick_formatter(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c]), 'prop')(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'prop', settings['metric_' + c])) + ' of total ' + lookups.metric_labels[settings['metric_' + c]] + '<br>' + 
+								d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'num', settings['metric_' + c]))) + ' ' + lookups.metric_labels[settings['metric_' + c]] + lookups.unit_labels.num + '<br>' +
+								'(' + d3.format(',')(d3.round(find_risk_sbar_value(e, settings['age_' + c], settings['year_' + c], settings['geo_' + c], settings['sex_' + c], 'rate', settings['metric_' + c]))) + lookups.unit_labels.num + ' people)'
+						});
+					}
+				});
+			});
+		
+		// update the rectangles
+			// rebind the data
+				risk_sbar_rects[c] = risk_sbar_rects[c]
+					.data(risk_sbar_data[c]['flat'], function(d) { return d.cause_risk; });
+			// insert new rectangles
+				risk_sbar_rects[c]
+				  .enter().insert('rect', '.risk_y.axis')
+					.attr('x', risk_left_pad)
+					.attr('y', function(d) { return d.y; })
+					.attr('title', function(d) { return d.tooltip; })
+					.attr('width', 0)
+					.attr('height', function(d) { return d.height; })
+					.style('fill', function(d) { return sbar_color_lookup[d.cause_color]; })
+					.attr('class', 'sbar_rect');
+			// update existing rectangles
+				risk_sbar_rects[c]
+					.attr('title', function(d) { return d.tooltip; })
+				  .transition().ease('linear').duration(1000)
+					.attr('x', function(d) { return d.x; })
+					.attr('y', function(d) { return d.y; })
+					.attr('width', function(d) { return d.width; })
+					.attr('height', function(d) { return d.height; });
+			// remove rectangles that no longer exist
+				risk_sbar_rects[c]
+				  .exit().transition().duration(500).style('opacity', 1e-6).remove();
+
+		// update tooltips
+			$('.sbar_rect').poshytip({
 					slide: false, 
 					followCursor: true, 
 					alignTo: 'cursor', 
@@ -409,8 +377,40 @@
 					className: 'tip-twitter',
 					offsetY: 5
 			});
+			
+		// show/hide back button
+			risk_back_button[c].attr('visibility', settings['risk_cat_' + c] != 'summary' ? 'visible' : 'hidden');
+		
+		// update label rectangles
+			// remove old rectangles
+				risk_sbar_label_rects[c].remove();
+			// redraw the rectangles
+				risk_sbar_label_rects[c] = d3.select('#sbar_' + c).selectAll('risk_label_rects')
+					.data(risk_y_domain[c])
+				  .enter().append('rect')
+					.attr('x', 0)
+					.attr('width', risk_left_pad)
+					.attr('y', function(d) { return risk_y_scale[c](d) - risk_bar_thickness[c]/2; })
+					.attr('height', risk_bar_thickness[c])
+					.attr('class', 'risk_label_rect')
+					.attr('onclick', function(d) { return settings['risk_cat_' + c] == 'summary' ? 'change_risk_cat("' + risk_lookup[d].risk + '",' + c + ')' : '' })
+					.style('cursor', settings['risk_cat_' + c] == 'summary' ? 'pointer' : 'default')
+					.attr('title', function(d) { return risk_lookup[d].name; });
+			// redraw tooltips
+				$('.risk_label_rect').poshytip({
+						slide: false, 
+						followCursor: true, 
+						alignTo: 'cursor', 
+						showTimeout: 0, 
+						hideTimeout: 0, 
+						alignX: 'center', 
+						alignY: 'inner-bottom', 
+						className: 'tip-twitter',
+						offsetY: 5
+				});
+		}
 	}
-
+/*
 // fill in the legend
 	var sbar_legend_entries = [
 		{ name: 'HIV & TB', 					color: sbar_color_lookup[1] },
@@ -436,4 +436,4 @@
 		.attr('y', 15)
 		.text(function(d) { return d.name; })
 		.attr('class', 'sbar_legend');
-	
+*/

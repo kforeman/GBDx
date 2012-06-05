@@ -1,5 +1,5 @@
 /*	Author: 	Kyle Foreman (kforeman@post.harvard.edu)
-	Date:		7 January 2012
+	Date:		5 June 2012
 	Purpose:	Generate treemaps
 */
 
@@ -8,21 +8,19 @@
 			A: colorbrewer['Reds'][9].splice(2,7),
 			B: colorbrewer['Blues'][9].splice(2,7),
 			C: colorbrewer['Greens'][9].splice(2,7) 
-		};
-		treemap_interps = {};
-	['A', 'B', 'C'].map(function(c) {	
-		treemap_interps[c] = [];
-		for (i=0; i<6; i++) {
-			treemap_interps[c].push(d3.interpolate(treemap_color_list[c][i], treemap_color_list[c][i+1]));
-		}
+		},
+		treemap_color_scales = {};
+	['A', 'B', 'C'].forEach(function(c) {	
+		treemap_color_scales[c] = d3.scale.linear()
+			.domain(d3.range(0, 1.01, 1/5))
+			.range(treemap_color_list[c])
+			.clamp(true);
 	});
-	treemap_size_scale = d3.scale.linear()
+	var treemap_size_scale = d3.scale.linear()
 		.domain([0, .33])
-		.range([0, 6 - 1e-6])
 		.clamp(true);
-	treemap_change_scale = d3.scale.linear()
+	var treemap_change_scale = d3.scale.linear()
 		.domain([-.03, .03])
-		.range([0, 6 - 1e-6])
 		.clamp(true);
 	function color_treemap(scale, d, rf, c) {
 		if (isNaN(d.value)) {
@@ -36,7 +34,7 @@
 		}
 		else if (scale == 'size') {
 			var v = treemap_size_scale(d.value);
-			return treemap_interps[d.cause_viz.substr(0,1)][Math.floor(v)](v - Math.floor(v));
+			return treemap_color_scales[d.cause_viz.substr(0,1)](v);
 		}
 		else if (scale == 'risk') {
 			return rf == 'b' ? treemap_color_list[d.cause_viz.substr(0,1)][1] : treemap_color_list[d.cause_viz.substr(0,1)][5];
@@ -44,25 +42,25 @@
 		else if (scale == 'change') {
 			if (d.cause_viz.length == 3) return '#444';
 			else {
-				var val2005 = retrieve_value(settings['metric_' + c], settings['age_' + c], lookups['reverse_year']['2005'], 'rate', settings['geo_' + c], settings['sex_' + c], d.cause_viz),
-					val2010 = retrieve_value(settings['metric_' + c], settings['age_' + c], lookups['reverse_year']['2010'], 'rate', settings['geo_' + c], settings['sex_' + c], d.cause_viz),
+				var val2005 = retrieve_value(settings['metric_' + c], settings['age_' + c], lookups['year_from_name']['2005'].year_viz, 'rate', settings['geo_' + c], settings['sex_' + c], d.cause_viz),
+					val2010 = retrieve_value(settings['metric_' + c], settings['age_' + c], lookups['year_from_name']['2010'].year_viz, 'rate', settings['geo_' + c], settings['sex_' + c], d.cause_viz),
 					chg = Math.log(val2010 / val2005) / (2010-2005);
 				var v = treemap_change_scale(chg);
 				if (isNaN(chg)) return '#444';
-				else return treemap_interps[d.cause_viz.substr(0,1)][Math.floor(v)](v - Math.floor(v));				
+				else return treemap_color_scales[d.cause_viz.substr(0,1)](v);				
 			}
 		}
 	}
 
 // treeify the data
-	treemap_data_A = {children: [], cause_viz: 'T'};
+	var treemap_data_0 = {children: [], cause_viz: 'T'};
 	treemap_leaves = cause_list.filter(function(d) { return d.leaf == 1;	});
-	treemap_start_A.filter(function(d) {
+	treemap_start_0.filter(function(d) {
 		return lookups['cause'][d.cause_viz] ? parseInt(lookups['cause'][d.cause_viz].leaf) == 1 : 0;
-	}).forEach(treeify_A);
-	function treeify_A(node) {
+	}).forEach(treeify_0);
+	function treeify_0(node) {
 		var i = node.cause_viz.lastIndexOf('_');
-			p = i < 0 ? treemap_data_A : treeify_A({cause_viz: node.cause_viz.substring(0, i), children: []})
+			p = i < 0 ? treemap_data_0 : treeify_0({cause_viz: node.cause_viz.substring(0, i), children: []})
 			n = p.children.length;
 		for (j = -1; ++j < n;) {
 			if (p.children[j].cause_viz === node.cause_viz) {
@@ -73,13 +71,30 @@
 		return node;
 	}
 	
-	treemap_data_B = {children: [], cause_viz: 'T'};
-	treemap_start_B.filter(function(d) {
+	var treemap_data_1 = {children: [], cause_viz: 'T'};
+	treemap_start_1.filter(function(d) {
 		return lookups['cause'][d.cause_viz] ? parseInt(lookups['cause'][d.cause_viz].leaf) == 1 : 0;
-	}).forEach(treeify_B);
-	function treeify_B(node) {
+	}).forEach(treeify_1);
+	function treeify_1(node) {
 		var i = node.cause_viz.lastIndexOf('_');
-			p = i < 0 ? treemap_data_B : treeify_B({cause_viz: node.cause_viz.substring(0, i), children: []})
+			p = i < 0 ? treemap_data_1 : treeify_1({cause_viz: node.cause_viz.substring(0, i), children: []})
+			n = p.children.length;
+		for (j = -1; ++j < n;) {
+			if (p.children[j].cause_viz === node.cause_viz) {
+				return p.children[j];
+			}
+		}
+		p.children.push(node);
+		return node;
+	}
+	
+	var treemap_data_2 = {children: [], cause_viz: 'T'};
+	treemap_start_2.filter(function(d) {
+		return lookups['cause'][d.cause_viz] ? parseInt(lookups['cause'][d.cause_viz].leaf) == 1 : 0;
+	}).forEach(treeify_2);
+	function treeify_2(node) {
+		var i = node.cause_viz.lastIndexOf('_');
+			p = i < 0 ? treemap_data_2 : treeify_2({cause_viz: node.cause_viz.substring(0, i), children: []})
 			n = p.children.length;
 		for (j = -1; ++j < n;) {
 			if (p.children[j].cause_viz === node.cause_viz) {
@@ -91,31 +106,37 @@
 	}
 
 // keep a list of which treemap data has been loaded
-	appended_treemap_data = {};
+	var appended_treemap_data = {};
 
 // generate default treemap layout
-	treemap_layout_A = d3.layout.treemap()
-			.size([content_width * .8, height * .5 - 10])
+	var treemap_layout_0 = d3.layout.treemap()
+			.size([content_width, height])
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
-			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'A' ? 1 : -1) : a.value - b.value; });
-	treemap_layout_B = d3.layout.treemap()
-			.size([content_width * .8, height * .5 - 10])
+			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'B' ? 1 : -1) : a.value - b.value; });
+	var treemap_layout_1 = d3.layout.treemap()
+			.size([content_width, height * .5])
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
-			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'A' ? 1 : -1) : a.value - b.value; });
+			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'B' ? 1 : -1) : a.value - b.value; });
+	var treemap_layout_2 = d3.layout.treemap()
+			.size([content_width, height * .5])
+			.value(function(d) { return d.treemap_start_val; })
+			.padding(1)
+			.sticky(true)
+			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'B' ? 1 : -1) : a.value - b.value; });
 
 // set the size of treemap labels
-	min_treemap_label = .01;
-	treemap_label_sizer = d3.scale.sqrt().domain([min_treemap_label, .5]).range([8,40]).clamp(true);
+	var min_treemap_label = .01,
+		treemap_label_sizer = d3.scale.sqrt().domain([min_treemap_label, .5]).range([8,40]).clamp(true);
 
 // find the indices of tree leaves to make inserting new data easier
-	treemap_layout_A.nodes(treemap_data_A);
-	var flat_indices = {};
-	tree_indices = {};
-	find_tree_indices(treemap_data_A);
+	treemap_layout_0.nodes(treemap_data_0);
+	var flat_indices = {},
+		tree_indices = {};
+	find_tree_indices(treemap_data_0);
 	function find_tree_indices(data) {
 		data['children'].map(function(d,i) { 
 			flat_indices[d.cause_viz] = i; 
@@ -136,14 +157,15 @@
 // make a list of which depths a cause should be visible at
 	var treemap_depth_visibility = {'T': false},
 		treemap_highlight_visibility = {'T': {1: true, 2: true, 3: true, 4: true}},
-		treemap_cause_classes = {'A': {'T': {}}, 'B': {'T': {}}};
-	$.map(tree_indices, function(i, c) {
+		treemap_cause_classes = {0: {'T': {}}, 1: {'T': {}}, 2: {'T' : {}}};
+	$.each(tree_indices, function(c, i) {
 		treemap_depth_visibility[c] = {};
 		treemap_highlight_visibility[c] = {};
-		treemap_cause_classes['A'][c] = {};
-		treemap_cause_classes['B'][c] = {};
-		$.map(lookups['tree_depth'], function(d) {
-			var dd = 'treemap_data_A';
+		treemap_cause_classes[0][c] = {};
+		treemap_cause_classes[1][c] = {};
+		treemap_cause_classes[2][c] = {};
+		d3.range(1, max_treemap_depth + 1).forEach(function(d) {
+			var dd = 'treemap_data_0';
 			i.map(function(j) { dd = dd + '["children"][' + j + ']'; });
 			eval('var has_kids = ' + dd + '.hasOwnProperty("children")');
 			if (d == 1) treemap_depth_visibility[c][d] = (i.length == d);
@@ -152,10 +174,10 @@
 			if (d == 1) treemap_highlight_visibility[c][d] = (i.length == d);
 			else treemap_highlight_visibility[c][d] = (i.length <= d+1);
 		});
-		['cell', 'rect', 'clip', 'rf', 'label'].map(function(a) {
-			AB.map(function(cc) {
+		['cell', 'rect', 'clip', 'rf', 'label'].forEach(function(a) {
+			menus_012.forEach(function(cc) {
 				treemap_cause_classes[cc][c][a] = '';
-				$.map(lookups['tree_depth'], function(d) {
+				d3.range(1, max_treemap_depth + 1).forEach(function(d) {
 					if (treemap_depth_visibility[c][d]) treemap_cause_classes[cc][c][a] = treemap_cause_classes[cc][c][a] + ' treemap_' + cc + '_' + d + '_' + a;
 				});
 			});
@@ -163,8 +185,8 @@
 	});
 
 // function to change cause upon clicking the treemap
-	function treemap_change_cause(new_cause) {
-		if (settings['tree_click']) change_cause('AB', new_cause);
+	function treemap_change_cause(new_cause, c) {
+		change_cause(new_cause, c);
 	}
 
 // create placeholders for the various treemap components
@@ -176,18 +198,16 @@
 		tree_clips = {},
 		tree_highlights = {};
 			
-// loop through sections A and B
-	AB.map(function(c) {
+// loop through canvases
+	canvas_data.forEach(function(canvas) {
+		var c = canvas.canvas;
 		
 	// add a g for this treemap
-		g = d3.select('#' + c)
-		  .append('g')
-		  	.attr('id', 'treemap_' + c)
-		  	.attr('transform', 'translate(' + (settings['chart_' + c] == 'treemap' ? content_buffer : -1 * content_width) + ',' + content_buffer + ')');
+		var g = d3.select('#treemap_' + c);
 	
 	// make cells for each cause
 		tree_cells[c] = g.selectAll('tree_cells')
-			.data(c == 'A' ? treemap_layout_A.nodes(treemap_data_A) : treemap_layout_B.nodes(treemap_data_B))
+			.data(c == 0 ? treemap_layout_0.nodes(treemap_data_0) : (c == 1 ? treemap_layout_1.nodes(treemap_data_1) : treemap_layout_2.nodes(treemap_data_2)))
 		  .enter().append('g')
 		  	.attr('onclick', function(d) {
 		  		return 'treemap_change_cause("' + d.cause_viz + '");';
@@ -209,13 +229,24 @@
 				case 3: 	return 1; 	break;
 				default: 	return 1; 	break;
 			}})
-			.attr('class', function(d) { return treemap_cause_classes[c][d.cause_viz]['rect']; })
+			.attr('class', function(d) { return 'treemap_rect ' + treemap_cause_classes[c][d.cause_viz]['rect']; })
 			.style('fill', function(d) { return color_treemap(settings['tree_color_' + c], d, 'b', c); });
 	
+	// add clipping masks to prevent labels from overrunning their boxes
+		tree_clips[c] = tree_cells[c].append('clipPath')
+			.attr('id', function(d) {
+				 return 'tree_clip_' + c + '_' + d.cause_viz;
+			})
+		  .append('rect')
+			.attr('class', function(d) { return 'treemap_rect ' + treemap_cause_classes[c][d.cause_viz]['clip']; })
+			.attr('clip-rule', 'nonzero')
+			.attr('width', function(d) { return d.dx >= 0 ? d.dx : 0; })
+			.attr('height', function(d) { return d.dy >= 0 ? d.dy : 0; });
+	
 	// rectangle overlays for risks
-		tree_rfs[c]= tree_cells[c].append('rect')
-			.attr('class', function(d) { return treemap_cause_classes[c][d.cause_viz]['rf']; })
-			.attr('width', function(d) { return d3.max([0, d.dx * retrieve_treemap_rf(settings['geo_' + c], d.cause_viz, settings['sex_' + c], settings['tree_risk_' + c], settings['metric_' + c], settings['age_' + c], settings['year_' + c])]); })
+		tree_rfs[c] = tree_cells[c].append('rect')
+			.attr('class', function(d) { return 'treemap_rect ' + treemap_cause_classes[c][d.cause_viz]['rf']; })
+			.attr('width', function(d) { return d3.max([0, d.dx * retrieve_treemap_rf(settings['geo_' + c], d.cause_viz, settings['sex_' + c], settings['risk_' + c], settings['metric_' + c], settings['age_' + c], settings['year_' + c])]); })
 			.attr('x', function(d) { switch(d.depth) {
 				case 0: 	return 0; 	break;
 				case 1: 	return 3; 	break;
@@ -238,33 +269,29 @@
 				default: 	return d3.max([0,d.dy-1*2]); 	break;
 			}})
 			.attr('stroke', 'none')
-			.style('fill', function(d) { return color_treemap(settings['tree_color_' + c], d, 'r', c); });
-	
-	tree_clips[c] = tree_cells[c].append('clipPath')
-		.attr('id', function(d) {
-			 return 'tree_clip_' + c + '_' + d.cause_viz;
-		})
-	  .append('rect')
-		.attr('class', function(d) { return treemap_cause_classes[c][d.cause_viz]['clip']; })
-	  	.attr('clip-rule', 'nonzero')
-	  	.attr('width', function(d) { return d.dx >= 0 ? d.dx : 0; })
-		.attr('height', function(d) { return d.dy >= 0 ? d.dy : 0; });
-	tree_labels[c] = tree_cells[c].append('text')
-		.attr('class', function(d) { return treemap_cause_classes[c][d.cause_viz]['label'] + ' treemap_label'; })
-		.attr('x', 0)
-		.text(function(d) { return lookups['cause'][d.cause_viz] ? lookups['cause'][d.cause_viz].cause_short : ''; })
-		.attr('dx', function(d) {
-			 return ((d.dy > 1.3*d.dx ? treemap_label_sizer(d.value) : 0) + 8) + 'px';
-		})
-		.attr('dy', function(d) {
-			return d.dy > 1.3*d.dx ? '6px' : '2px';
-		})
-		.attr('clip-path', function(d) {
-			return 'url(#tree_clip_' + c + '_' + d.cause_viz + ')';
-		})
-		.attr('font-size', function(d) { return treemap_label_sizer(d.value) + 'px'; })
-		.style('opacity', function(d) { return d.value >= min_treemap_label ? 1 : 1e-6})
-		.style('writing-mode', function(d) { return d.dy > 1.3*d.dx ? 'tb' : 'lr'; });
+			.style('opacity', settings['treemap_color_' + c] == 'risk' ? 1 : 1e-5)
+			.attr('clip-path', function(d) {
+				return 'url(#tree_clip_' + c + '_' + d.cause_viz + ')';
+			})
+			.style('fill', function(d) { return color_treemap('risk', d, 'r', c); });
+
+	// label the treemap
+		tree_labels[c] = tree_cells[c].append('text')
+			.attr('class', function(d) { return treemap_cause_classes[c][d.cause_viz]['label'] + ' treemap_label'; })
+			.attr('x', 0)
+			.text(function(d) { return lookups['cause'][d.cause_viz] ? lookups['cause'][d.cause_viz].cause_short : ''; })
+			.attr('dx', function(d) {
+				 return ((d.dy > 1.3*d.dx ? treemap_label_sizer(d.value) * (c == 0 ? 1.5 : 1) : 0) + 8) + 'px';
+			})
+			.attr('dy', function(d) {
+				return d.dy > 1.3*d.dx ? '6px' : '2px';
+			})
+			.attr('clip-path', function(d) {
+				return 'url(#tree_clip_' + c + '_' + d.cause_viz + ')';
+			})
+			.attr('font-size', function(d) { return (treemap_label_sizer(d.value) * (c == 0 ? 1.5 : 1))+ 'px'; })
+			.style('opacity', function(d) { return d.value >= (c == 0 ? .5 : 1) * min_treemap_label ? 1 : 1e-6})
+			.style('writing-mode', function(d) { return d.dy > 1.3*d.dx ? 'tb' : 'lr'; });
 	
 	// add mouseover titles to each cause
 		$('.treemap_' + c + '_cell').poshytip({
@@ -285,7 +312,8 @@
 			.style('fill', 'none')
 			.style('stroke-width', 2)
 			.style('pointer-events', 'none');
-		
+
+	/*	
 	// add legends
 		treemap_legends[c] = g.selectAll()
 			.data(tree_color_options)
@@ -456,32 +484,32 @@
 				.attr('height', 30)
 				.style('stroke', 'none')
 				.style('fill', treemap_color_list[d][1]);
-		})
+		})*/
 		
 	
 	});
 
 // update the treemap
-	var current_cause = { 'A' : '',	'B' : ''},
-		current_depth = { 'A' : '',	'B' : ''};
-	function refresh_treemap(c, dur) {
-		if (typeof dur == 'undefined') var dur = 1000;
+	var current_cause = { 0 : '', 1 : '', 2: '' },
+		current_depth = { 0 : '', 1 : '', 2: '' };
+	function refresh_treemap(c, setting) {
+		var dur = (setting == 'treemap_depth' ? 0 : 1000);
 		
 	// find desired geo/sex/age/year/metric
-		var geo = settings['geo_' + c],
-			sex = settings['sex_' + c],
-			year = settings['year_' + c],
-			age = settings['age_' + c],
-			metric = settings['metric_' + c],
+		var geo = 	settings['geo_' + c],
+			sex = 	settings['sex_' + c],
+			year = 	settings['year_' + c],
+			age = 	settings['age_' + c],
+			metric =settings['metric_' + c],
 			cause = settings['cause_' + c],
-			unit = settings['unit_' + c],
+			unit = 	settings['unit_' + c],
 			chart = settings['chart_' + c],
-			depth = settings['tree_depth_' + c],
-			tree_color = settings['tree_color_' + c],
-			risk = settings['tree_risk_' + c];
+			depth = settings['treemap_depth_' + c],
+			treemap_color = settings['treemap_color_' + c],
+			risk = 	settings['risk_' + c];
 	
 	// update only if this chart is displayed
-		if (chart == 'treemap') {
+		if (chart_visibility['treemap_' + c]) {
 			
 		// attach the data to the treemap structure if it hasn't been already
 			if (appended_treemap_data[geo + '_' + sex + '_' + c + '_' + metric] != 1) {
@@ -489,21 +517,27 @@
 			}
 			
 		// update the data
-			if (c == 'A') {
-				treemap_layout_A.nodes(treemap_data_A);
-				treemap_layout_A.value(function(d) {
-					return d[settings['geo_A'] + '_' + settings['sex_A']] ? (d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']] ? parseFloat(d[settings['geo_A'] + '_' + settings['sex_A']][settings['metric_A']]['mpc_' + settings['age_A'] + '_' + settings['year_A']]) : 0) : 0;
+			if (c == 0) {
+				treemap_layout_0.nodes(treemap_data_0);
+				treemap_layout_0.value(function(d) {
+					return d[geo + '_' + sex] ? (d[geo + '_' + sex][metric] ? parseFloat(d[geo + '_' + sex][metric]['mpc_' + age + '_' + year]) : 0) : 0;
 				});
-				tree_cells['A'].data(treemap_layout_A);	
+				tree_cells[c].data(treemap_layout_0);	
 			}
-			else if (c == 'B') {
-				treemap_layout_B.nodes(treemap_data_B);
-				treemap_layout_B.value(function(d) {
-					return d[settings['geo_B'] + '_' + settings['sex_B']] ? (d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']] ? parseFloat(d[settings['geo_B'] + '_' + settings['sex_B']][settings['metric_B']]['mpc_' + settings['age_B'] + '_' + settings['year_B']]) : 0) : 0;
+			else if (c == 1) {
+				treemap_layout_1.nodes(treemap_data_1);
+				treemap_layout_1.value(function(d) {
+					return d[geo + '_' + sex] ? (d[geo + '_' + sex][metric] ? parseFloat(d[geo + '_' + sex][metric]['mpc_' + age + '_' + year]) : 0) : 0;
 				});
-				tree_cells['B'].data(treemap_layout_B);	
+				tree_cells[c].data(treemap_layout_1);	
 			}
-		
+			else if (c == 2) {
+				treemap_layout_2.nodes(treemap_data_2);
+				treemap_layout_2.value(function(d) {
+					return d[geo + '_' + sex] ? (d[geo + '_' + sex][metric] ? parseFloat(d[geo + '_' + sex][metric]['mpc_' + age + '_' + year]) : 0) : 0;
+				});
+				tree_cells[c].data(treemap_layout_2);	
+			}
 		// set which rectangles are visible
 			tree_cells[c]
 				.style('visibility', function(d) {
@@ -524,7 +558,7 @@
 				.duration(current_depth[c] == depth ? dur : 0)
 				.attr('width', function(d) { return d.dx >= 0 ? d.dx : 0; })
 				.attr('height', function(d) { return d.dy >= 0 ? d.dy : 0; })
-				.style('fill', function(d) { return color_treemap(settings['tree_color_' + c], d, 'b', c); });
+				.style('fill', function(d) { return color_treemap(treemap_color, d, 'b', c); });
 		
 		// find position of highlight
 			if (cause == 'T') dd = 'treemap_data_' + c;
@@ -548,7 +582,7 @@
 			current_cause[c] = cause;
 		
 		// update risk overlays
-			if (tree_color == 'risk') {
+			if (treemap_color == 'risk') {
 				d3.selectAll('.treemap_' + c + '_' + depth + '_rf')
 					.transition()
 					.ease('linear')
@@ -575,15 +609,14 @@
 						case 3: 	return d3.max([0,d.dy-1*2]); 	break;
 						default: 	return d3.max([0,d.dy-1*2]); 	break;
 					}})
-					.style('fill-opacity', 1)
-					.style('fill', function(d) { return color_treemap('risk', d, 'r', c); });			
+					.style('opacity', 1);	
 			}
 			else {
 				tree_rfs[c]
 					.transition()
 					.ease('linear')
 					.duration(dur)
-					.style('fill-opacity', 1e-6);
+					.style('opacity', 1e-6);
 			}
 		
 		// update the label sizes
@@ -598,15 +631,16 @@
 				.ease('linear')
 				.duration(current_depth[c] == depth ? dur : 0)
 			  	.attr('dx', function(d) {
-					 return ((d.dy > 1.3*d.dx ? treemap_label_sizer(d.value) : 0) + 8) + 'px';
+					return ((d.dy > 1.3*d.dx ? treemap_label_sizer(d.value) * (c == 0 ? 1.5 : 1) : 0) + 8) + 'px';
 				})
 				.attr('dy', function(d) {
 					return d.dy > 1.3*d.dx ? '6px' : '2px';
 				})
-				.attr('font-size', function(d) { return treemap_label_sizer(d.value) + 'px'; })
-				.style('opacity', function(d) { return d.value >= min_treemap_label ? 1 : 1e-6})
+				.attr('font-size', function(d) { return (treemap_label_sizer(d.value) * (c == 0 ? 1.5 : 1))+ 'px'; })
+				.style('opacity', function(d) { return d.value >= (c == 0 ? .5 : 1) * min_treemap_label ? 1 : 1e-6})
 				.style('writing-mode', function(d) { return d.dy > 1.3*d.dx ? 'tb' : 'lr'; });
 		
+		/*
 		// update legends
 			d3.select('#treemap_size_title_' + c).text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short);
 			d3.select('#treemap_change_title_' + c).text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + ' per 100,000')
@@ -621,6 +655,7 @@
 			  		return d.val == settings['tree_color_' + c] ? 1 : 1e-6;
 			  	});
 			 
+		*/
 		// update current settings
 			current_depth[c] = depth;
 		}

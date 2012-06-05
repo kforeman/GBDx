@@ -26,10 +26,13 @@
 
 .tree.axis text {
 	fill: #555;
-	text-shadow: none;
 	font-size: 12px;
 }
 
 .treemap_cell {
 	cursor: pointer;
+}
+
+.treemap_rect {
+	shape-rendering:	crispEdges;
 }

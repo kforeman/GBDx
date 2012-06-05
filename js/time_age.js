@@ -1,5 +1,5 @@
 /*	Author:		Kyle Foreman (kforeman@post.harvard.edu)
-	Date:		10 January 2012
+	Date:		5 June 2012
 	Purpose:	Create time and age plots
 */
 
@@ -46,32 +46,20 @@
 		year_lines = {};
 
 // functions to change settings when clicking on the plot
-	function change_age_ta(new_age) {
-		if (settings['time_age_click']) {
-			change_age('AB', new_age);
-			update_slider('age', 'A', new_age, true);
-			update_slider('age', 'B', new_age, true);
-			update_slider('age', 'AB', new_age, true);
-		}
+	function change_age_ta(new_age, c) {
+		change_age(new_age, c);
 	}
-	function change_time_ta(new_year) {
-		if (settings['time_age_click']) {
-			change_year('AB', new_year);
-			update_slider('year', 'A', new_year, true);
-			update_slider('year', 'B', new_year, true);
-			update_slider('year', 'AB', new_year, true);			
-		}
+	function change_time_ta(new_year, c) {
+		change_year(new_year, c);
 	}
 
 
-// loop through sections A and B
-	AB.map(function(c) {
+// loop through canvases
+	canvas_data.forEach(function(canvas) {
+		var c = canvas.canvas;
 		
-	// add a g for this chart
-		var g = d3.select('#' + c)
-		  .append('g')
-		  	.attr('id', 'time_age_' + c)
-		  	.attr('transform', 'translate(' + (settings['chart_' + c] == 'time_age' ? content_buffer : -1 * content_width) + ',' + content_buffer + ')');
+	// select the g for this chart
+		var g = d3.select('#time_age_' + c);
 	
 	// add the time plot
 		var tp = g.append('g')
@@ -147,7 +135,7 @@
 			.text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + unit_list[settings['unit_' + c]]);
 	
 	// add age points and lines in the requisite positions
-		ap_plot = ap.append('g').attr('transform', 'translate(50, 0)');
+		var ap_plot = ap.append('g').attr('transform', 'translate(50, 0)');
 		age_lines[c] = ap_plot.selectAll()
 			.data(ages_for_axis)
 		  .enter().append('line')
@@ -171,11 +159,11 @@
 		  	.attr('cy', 320)
 		  	.attr('r', 3)
 		  	.attr('onclick', function(d) {
-		  		return 'change_age_ta(' + lookups['reverse_age'][d] + ');'
+		  		return 'change_age_ta(' + lookups['age_from_short'][d].age_viz + ',' + c + ');'
 		  	});
 	
 	// add time points and lines in the requisite positions
-		tp_plot = tp.append('g').attr('transform', 'translate(50, 0)');
+		var tp_plot = tp.append('g').attr('transform', 'translate(50, 0)');
 		year_lines[c] = tp_plot.selectAll()
 			.data(years_for_axis)
 		  .enter().append('line')
@@ -199,7 +187,7 @@
 		  	.attr('cy', 320)
 		  	.attr('r', 3)
 		  	.attr('onclick', function(d) {
-		  		return 'change_time_ta(' + lookups['reverse_year'][d] + ');'
+		  		return 'change_time_ta(' + lookups['year_from_name'][d].year_viz + ',' + c + ');'
 		  	});
 	});
 	
@@ -217,10 +205,10 @@
 			chart = settings['chart_' + c];
 	
 	// update the plot if it's displayed
-		if (chart == 'time_age') {
+		if (chart_visibility['time_age_' + c]) {
 			
 		// load in the data if it hasn't been already
-			if (settings['chart_A'] == 'map' || settings['chart_B'] == 'map') retrieve_map_data(cause, sex, metric);
+			if (settings['chart_1'] == 'map' || settings['chart_2'] == 'map') retrieve_map_data(cause, sex, metric);
 			else retrieve_treemap_data(geo, sex, metric);
 		
 		// make arrays of the data
@@ -234,54 +222,54 @@
 		// find max value for age plot
 			var age_vals = [];
 			ages_for_axis.map(function(a) {
-				age_vals.push(time_age_data[lookups['reverse_age'][a] + '_' + year][2]);
+				age_vals.push(time_age_data[lookups['age_from_short'][a].age_viz + '_' + year][2]);
 			});
 			var age_y_max = d3.max(age_vals);
 		
 		// find max value for year plot
 			var year_vals = [];
 			years_for_axis.map(function(y) {
-				year_vals.push(time_age_data[age + '_' + lookups['reverse_year'][y]][2]);
+				year_vals.push(time_age_data[age + '_' + lookups['year_from_name'][y].year_viz][2]);
 			});
 			var year_y_max = d3.max(year_vals);
 		
 		// update the scales
 			age_y_scales[c].domain([0, age_y_max]);
-			age_y_axes[c].scale(age_y_scales[c]);
+			age_y_axes[c].scale(age_y_scales[c]).tickFormat(tick_formatter(age_y_max, settings['unit_' + c]));
 			age_y_labels[c].transition().duration(1000).call(age_y_axes[c]);
 			year_y_scales[c].domain([0, year_y_max])
-			year_y_axes[c].scale(year_y_scales[c]);
+			year_y_axes[c].scale(year_y_scales[c]).tickFormat(tick_formatter(year_y_max, settings['unit_' + c]));
 			year_y_labels[c].transition().duration(1000).call(year_y_axes[c]);
 			
 		// update the titles
 			ta_titles[c].text(lookups['geo'][settings['geo_' + c]].name);
 			ta_subtitles[c].text(lookups['cause'][settings['cause_' + c]].cause_name);
-			ta_subtitles2[c].text(metric_list.filter(function(d) { return settings['metric_' + c] == d.val; })[0].short + unit_list[settings['unit_' + c]]);
+			ta_subtitles2[c].text(lookups.metric_labels[settings['metric_' + c]] + lookups.unit_labels[settings['unit_' + c]]);
 			
 		// update the age plot
 			age_points[c].transition().duration(1000)
 				.attr('cy', function(a) {
-					return age_y_scales[c](time_age_data[lookups['reverse_age'][a] + '_' + year][0]);
+					return age_y_scales[c](time_age_data[lookups['age_from_short'][a].age_viz + '_' + year][0]);
 				});
 			age_lines[c].transition().duration(1000)
 				.attr('y1', function(a) {
-					return age_y_scales[c](time_age_data[lookups['reverse_age'][a] + '_' + year][1]);
+					return age_y_scales[c](time_age_data[lookups['age_from_short'][a].age_viz + '_' + year][1]);
 				})
 				.attr('y2', function(a) {
-					return age_y_scales[c](time_age_data[lookups['reverse_age'][a] + '_' + year][2]);
+					return age_y_scales[c](time_age_data[lookups['age_from_short'][a].age_viz + '_' + year][2]);
 				});
 		
 		// update the time plot
 			year_points[c].transition().duration(1000)
 				.attr('cy', function(y) {
-					return year_y_scales[c](time_age_data[age + '_' + lookups['reverse_year'][y]][0]);
+					return year_y_scales[c](time_age_data[age + '_' + lookups['year_from_name'][y].year_viz][0]);
 				});
 			year_lines[c].transition().duration(1000)
 				.attr('y1', function(y) {
-					return year_y_scales[c](time_age_data[age + '_' + lookups['reverse_year'][y]][1]);
+					return year_y_scales[c](time_age_data[age + '_' + lookups['year_from_name'][y].year_viz][1]);
 				})
 				.attr('y2', function(y) {
-					return year_y_scales[c](time_age_data[age + '_' + lookups['reverse_year'][y]][2]);
+					return year_y_scales[c](time_age_data[age + '_' + lookups['year_from_name'][y].year_viz][2]);
 				});
 			
 		}

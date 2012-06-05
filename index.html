@@ -1,33 +1,27 @@
 <!DOCTYPE html>
 <html>
 	<!--	Author:		Kyle Foreman (kforeman@post.harvard.edu)
-			Date:		3 January 2012
+			Date:		3 June 2012
 			Purpose:	Load charts etc for GBD visualization tool
 	-->
 	<head>
   
 	<!-- header/title stuff -->
 		<meta http-equiv='Content-Type' content='text/html;charset=utf-8'>
-		<title>GBDx</title>
+		<title>GBD 2010</title>
 	
 	<!-- load in d3 -->
-		<script type='text/javascript' src='lib/d3-2.7.4/d3.min.js'></script>
-		<script type='text/javascript' src='lib/d3-2.7.4/d3.geo.min.js'></script>
-		<script type='text/javascript' src='lib/d3-2.7.4/d3.csv.min.js'></script>
-		<script type='text/javascript' src='lib/d3-2.7.4/d3.layout.min.js'></script>
+		<script type='text/javascript' src='lib/d3-2.9.1/d3.v2.js'></script>
 		<script type='text/javascript' src='lib/colorbrewer.js'></script>
 	
 	<!-- load in jquery libraries -->
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/js/jquery-1.7.min.js'></script>
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/js/jquery-ui-1.8.16.custom.min.js'></script>
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/js/jquery.ui.widget.js'></script>
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/js/jquery.poshytip.min.js'></script>
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/js/jquery.ui.widget.js'></script>
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/js/jquery.mousewheel.js'></script>
-		<script type='text/javascript' src='lib/jquery-ui-1.8.16/plugins/chosen/chosen.jquery.min.js'></script>
-		<link type='text/css' rel='stylesheet' href='lib/jquery-ui-1.8.16/css/custom-theme/jquery-ui-1.8.16.custom.css'/>
-		<link type='text/css' rel='stylesheet' href='lib/jquery-ui-1.8.16/css/custom-theme/poshytip.twitter.css'/>
-		<link type='text/css' rel='stylesheet' href='lib/jquery-ui-1.8.16/plugins/chosen/chosen.css'/>
+		<script type='text/javascript' src='lib/jquery-ui-1.8.20/js/jquery-1.7.2.min.js'></script>
+		<script type='text/javascript' src='lib/jquery-ui-1.8.20/js/jquery-ui-1.8.20.custom.min.js'></script>
+		<script type='text/javascript' src='lib/jquery-ui-1.8.20/plugins/poshytip-1.1/src/jquery.poshytip.js'></script>
+		<script type='text/javascript' src='lib/jquery-ui-1.8.20/plugins/chosen/chosen.jquery.min.js'></script>
+		<link type='text/css' rel='stylesheet' href='lib/jquery-ui-1.8.20/css/custom-theme/jquery-ui-1.8.20.custom.css'/>
+		<link type='text/css' rel='stylesheet' href='lib/jquery-ui-1.8.20/plugins/poshytip-1.1/src/tip-twitter/tip-twitter.css'/>
+		<link type='text/css' rel='stylesheet' href='lib/jquery-ui-1.8.20/plugins/chosen/chosen.css'/>
 		<link type='text/css' rel='stylesheet' href='css/tip-twitter.css'/>
 	
 	<!-- load Google web font (Open Sans) -->
@@ -47,36 +41,22 @@
 		</script>
 		<link type='text/css' rel='stylesheet' href='css/font.css'/>
 	
-	<!-- load parameters (either defaults or parsed from hash) -->
-		<script type='text/javascript' src='js/settings.js'></script>
+	<!-- well hello there, Mr iPad -->
+		<meta name='apple-mobile-web-app-capable' content='yes'>
 	
 	<!-- load resources (e.g. dropdown menu options, maps, etc) -->
 		<script type='text/javascript' src='resources/geo_list.js'></script>
 		<script type='text/javascript' src='resources/geojson_map.js'></script>
-	
-	<!-- preload some data from the MySQL server -->
 		<script type='text/javascript' src='js/preload.js'></script>
 	
+	<!-- create menus and deal with keeping track of settings, etc -->
+		<script type='text/javascript' src='js/menus_and_settings.js'></script>
+		<link type='text/css' rel='stylesheet' href='css/menus.css' />
+	
 	<!-- load the functions necessary for data retrieval -->
-		<script type='text/javascript' src='js/data.js'></script>
+		<script type='text/javascript' src='js/data.js'></script>  
 	
-	<!-- well hello there, Mr iPad -->
-		<meta name="apple-mobile-web-app-capable" content="yes">
-	  
-	</head>
-	
-
-	<body>
-	
-	<!-- create the basic page layout -->
-		<script type='text/javascript' src='js/layout.js'></script>
-		<link type='text/css' rel='stylesheet' href='css/layout.css'/>
-	
-	<!-- build the lefthand menu -->
-		<script type='text/javascript' src='js/menu.js'></script>
-		<link type='text/css' rel='stylesheet' href='css/menu.css'/>
-	
-	<!-- build geographic maps -->
+	<!-- build choropleth maps -->
 		<script type='text/javascript' src='js/map.js'></script>
 		<link type='text/css' rel='stylesheet' href='css/map.css'/>
 	
@@ -91,13 +71,7 @@
 	<!-- build time/age plots -->
 		<script type='text/javascript' src='js/time_age.js'></script>
 		<link type='text/css' rel='stylesheet' href='css/time_age.css'/>
-	
-	<!-- add some finishing touches to the viz -->
-		<script type='text/javascript' src='js/finishing_touches.js'></script>
-	
-	<!-- switch to starting settings -->
-		<script type='text/javascript' src='js/load_defaults.js'></script>
 		
 	
-  </body>
+	</head>
 </html>

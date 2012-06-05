@@ -3,6 +3,10 @@
 	Purpose:	Preload some data from MySQL that is required for subsequent steps (ie can't be loaded asynchronously)
 */
 
+
+// determine if we're online or not
+	var use_mysql = (window.location.host != '');
+
 // have a single object to store various menu lookups in
 	var lookups = {};	
 
@@ -21,14 +25,14 @@
 		}
 	});	
 	
-// load starting points for treemaps (doing it twice because of some annoying deep copy things in d3.layout)
+// load starting points for treemaps (doing it thrice because of some annoying deep copy things in d3.layout)
 	$.ajax({
 		url: use_mysql ? 'php/treemap_starting_values.php' : 'data/treemap/treemap_starting_values.csv',
 		dataType: use_mysql ? 'json' : 'text',
 		async: false,
 		success: function(data) { 
 			if (!use_mysql) data = d3.csv.parse(data);
-			treemap_start_A = data;
+			treemap_start_0 = data;
 		}
 	});
 	$.ajax({
@@ -37,7 +41,16 @@
 		async: false,
 		success: function(data) { 
 			if (!use_mysql) data = d3.csv.parse(data);
-			treemap_start_B = data;
+			treemap_start_1 = data;
+		}
+	});
+	$.ajax({
+		url: use_mysql ? 'php/treemap_starting_values.php' : 'data/treemap/treemap_starting_values.csv',
+		dataType: use_mysql ? 'json' : 'text',
+		async: false,
+		success: function(data) { 
+			if (!use_mysql) data = d3.csv.parse(data);
+			treemap_start_2 = data;
 		}
 	});
 

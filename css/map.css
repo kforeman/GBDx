@@ -15,14 +15,12 @@
 
 .map.axis text {
 	fill: #555;
-	text-shadow: none;
 	font-size: 12px;
 }
 
 .map_legend_title {
 	fill: #555;
-	text-shadow: none;
-	font-size: 15px;
+	font-size: 13px;
 }
 
 .map_highlight {
