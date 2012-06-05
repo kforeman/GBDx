@@ -659,6 +659,10 @@
 		// update current settings
 			current_depth[c] = depth;
 		}
+		
+		else {
+			d3.select('#treemap_' + c).selectAll('.treemap_cell').style('visibility', 'hidden');
+		}
 	}
 
 // insert new data into the correct leaves of the tree object
