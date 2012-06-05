@@ -17,7 +17,7 @@
 			.clamp(true);
 	});
 	var treemap_size_scale = d3.scale.linear()
-		.domain([0, .33])
+		.domain([0, .25])
 		.clamp(true);
 	var treemap_change_scale = d3.scale.linear()
 		.domain([-.03, .03])
@@ -353,7 +353,7 @@
 					.style('fill', treemap_interps[d][Math.floor(j/100 * 6)]((j/100 * 6) - Math.floor(j/100 * 6)));
 			});
 		});
-		var sc = d3.scale.linear().domain([0, .33]).range([0, 198]),
+		var sc = d3.scale.linear().domain([0, .25]).range([0, 198]),
 			ax = d3.svg.axis().scale(sc).ticks(5).orient('left').tickSize(4);
 		m.append('g')
 			.attr('transform', 'translate(0, 0)')
