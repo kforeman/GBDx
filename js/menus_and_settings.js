@@ -5,8 +5,8 @@
 
 // layout parameters
 	var menu_width = 250,
-		content_width = 750,
-		height = 750;
+		content_width = 725,
+		height = 725;
 		
 // list all the menu elements
 	var menu_elements = [
@@ -59,9 +59,9 @@
 		// age (in 1, 2, 3, etc format)
 			age_sync:			true,
 			age_0:				22,
-		// sex (M/F)
+		// sex (B/M/F)
 			sex_sync:			true,
-			sex_0:				'M',
+			sex_0:				'B',
 		// units (proportion, rate, number)
 			unit_sync:			true,
 			unit_0:				'rate',
@@ -731,7 +731,7 @@
 			tmp.append('td').attr('class', 'menu_slider').append('div')
 				.attr('id', function(d,i) { return 'menu_year_slider_' + i; }); 
 		// label for selected year
-			tmp.append('td')
+			tmp.append('td').append('span')
 				.attr('class', 'menu_slider_label')
 				.attr('id', function(d,i) { return 'menu_year_label_' + i; })
 				.text(function(d,i) { return lookups['year_to_name'][settings['year_' + i]].year_name; }); 
@@ -779,7 +779,7 @@
 			tmp.append('td').attr('class', 'menu_slider').append('div')
 				.attr('id', function(d,i) { return 'menu_age_slider_' + i; }); 
 		// label for selected age
-			tmp.append('td')
+			tmp.append('td').append('span')
 				.attr('class', 'menu_slider_label')
 				.attr('id', function(d,i) { return 'menu_age_label_' + i; })
 				.text(function(d,i) { return lookups['age_to_name'][settings['age_' + i]].age_name; }); 
@@ -804,7 +804,8 @@
 		}
 			
 	// sex radio buttons
-		var sex_list = [{ val: 'M', name: 'Male',	label: 'Males' },
+		var sex_list = [{ val: 'B', name: 'Both',	label: 'Both Sexes' },
+						{ val: 'M', name: 'Male',	label: 'Males' },
 						{ val: 'F', name: 'Female',	label: 'Females' }];
 		lookups['sex'] = {};
 		sex_list.forEach(function(s) {
@@ -887,7 +888,7 @@
 			tmp.append('td').attr('class', 'menu_slider').append('div')
 				.attr('id', function(d,i) { return 'menu_treemap_depth_slider_' + i; }); 
 		// label for selected treemap_depth
-			tmp.append('td')
+			tmp.append('td').append('span')
 				.attr('class', 'menu_slider_label')
 				.attr('id', function(d,i) { return 'menu_treemap_depth_label_' + i; })
 				.text(function(d,i,p) { return settings['treemap_depth_' + i]; }); 
@@ -1105,7 +1106,7 @@
 			else {
 				refresh_map(chart);
 				refresh_sbar(chart);
-				refresh_time_age(c);
+				refresh_time_age(chart);
 				refresh_treemap(chart, setting);
 			}
 	}
