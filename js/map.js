@@ -20,7 +20,7 @@
 		flat_coord = d3.geo.path().projection(flat_proj);
 
 // load in the full map
-	$.ajax({
+	/*$.ajax({
 		url: 'resources/gbdx_full_map.json',
 		dataType: 'json',
 		async: false,
@@ -40,7 +40,7 @@
 				lookups.wb_to_iso[m.wb] = m.iso;
 			});
 		}
-	});
+	});*/
 		
 		
 		

@@ -768,8 +768,8 @@
 				lookups['age_from_name'] = {};
 				lookups['age_from_short'] = {};
 				age_list.forEach(function(a) {
-					lookups['age_to_name'][a.age_viz] = a;
-					if (a.age_name == 'Total') lookups['age_to_name'][a.age_viz]['age_name'] = 'All Ages';
+					lookups['age_to_name'][parseInt(a.age_viz)] = a;
+					if (a.age_name == 'Total') lookups['age_to_name'][parseInt(a.age_viz)]['age_name'] = 'All Ages';
 					lookups['age_from_name'][a.age_name] = a;
 					lookups['age_from_short'][a.age_axis] = a;
 				});
