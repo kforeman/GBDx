@@ -207,10 +207,6 @@
 	// update the plot if it's displayed
 		if (chart_visibility['time_age_' + c]) {
 			
-		// load in the data if it hasn't been already
-			if (settings['chart_1'] == 'map' || settings['chart_2'] == 'map') retrieve_map_data(cause, sex, metric);
-			else retrieve_treemap_data(geo, sex, metric);
-		
 		// make arrays of the data
 			var time_age_data = {};
 			age_list.map(function(a) {

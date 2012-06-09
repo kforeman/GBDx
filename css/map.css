@@ -1,31 +1,32 @@
 .map_path {
-	stroke: #fff;
-	stroke-width: 1px;
-	cursor: pointer;
+	stroke: 		#fff;
+	stroke-width: 	1px;
+	cursor: 		pointer;
 }
 
 .axis {
-  shape-rendering: crispEdges;
+  shape-rendering: 	crispEdges;
 }
 
 .map.axis line, .map.axis path {
-  stroke: #555;
-  fill: none;
+  stroke: 			#555;
+  fill: 			none;
 }
 
 .map.axis text {
-	fill: #555;
-	font-size: 12px;
+	fill: 			#555;
+	font-size: 		12px;
 }
 
 .map_legend_title {
-	fill: #555;
-	font-size: 13px;
+	fill: 			#555;
+	font-size: 		14px;
+	font-weight:	bold;
 }
 
 .map_highlight {
-	stroke: #000;
-	stroke-width: 2px;
+	stroke: 		#000;
+	stroke-width: 	2px;
 	pointer-events: none;
-	fill: none;
+	fill: 			none;
 }

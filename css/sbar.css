@@ -37,3 +37,9 @@
 .risk_back_button {
 	cursor:			pointer;
 }
+
+.risk_sbar_title {
+	fill: 			#555;
+	font-size: 		15px;
+	font-weight:	bold;
+}

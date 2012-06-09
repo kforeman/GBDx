@@ -4,35 +4,41 @@
 */
 
 .treemap_label {
-	text-anchor: start !important;
-	visibility: inherit !important;
-	text-shadow: 0px 0px 5px #000 !important;
-	fill: #fff !important;
+	text-anchor: 	start !important;
+	visibility: 	inherit !important;
+	text-shadow: 	0px 0px 5px #000 !important;
+	fill: 			#fff !important;
 	alignment-baseline: text-before-edge !important;
 }
 
 .treemap_legend_text {
-	fill: #555;
+	fill: 			#555;
 }
 
 .axis {
-  shape-rendering: crispEdges;
+  shape-rendering: 	crispEdges;
 }
 
 .tree.axis line, .tree.axis path {
-  stroke: #555;
-  fill: none;
+  stroke: 			#555;
+  fill: 			none;
 }
 
 .tree.axis text {
-	fill: #555;
-	font-size: 12px;
+	fill: 			#555;
+	font-size: 		12px;
 }
 
 .treemap_cell {
-	cursor: pointer;
+	cursor: 		pointer;
 }
 
 .treemap_rect {
 	shape-rendering:	crispEdges;
+}
+
+.treemap_title {
+	fill: 			#555;
+	font-size: 		15px;
+	font-weight:	bold;
 }

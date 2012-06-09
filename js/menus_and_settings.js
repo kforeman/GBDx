@@ -61,7 +61,7 @@
 			age_0:				22,
 		// sex (B/M/F)
 			sex_sync:			true,
-			sex_0:				'B',
+			sex_0:				'M',
 		// units (proportion, rate, number)
 			unit_sync:			true,
 			unit_0:				'rate',
@@ -737,8 +737,8 @@
 				.text(function(d,i) { return lookups['year_to_name'][settings['year_' + i]].year_name; }); 
 		// turn them all into sliders
 			$('[id^="menu_year_slider"]').slider({
-				min:	d3.min(year_list, function(y) { return y.year_viz; }),
-				max:	d3.max(year_list, function(y) { return y.year_viz; }),
+				min:	d3.min(year_list, function(y) { return parseInt(y.year_viz); }),
+				max:	d3.max(year_list, function(y) { return parseInt(y.year_viz); }),
 				animate:true,
 				change:	function(event, ui) {
 					$(this).parent().parent().find('.menu_slider_label').text(lookups['year_to_name'][ui.value].year_name);
@@ -769,6 +769,7 @@
 				lookups['age_from_short'] = {};
 				age_list.forEach(function(a) {
 					lookups['age_to_name'][a.age_viz] = a;
+					if (a.age_name == 'Total') lookups['age_to_name'][a.age_viz]['age_name'] = 'All Ages';
 					lookups['age_from_name'][a.age_name] = a;
 					lookups['age_from_short'][a.age_axis] = a;
 				});
@@ -785,8 +786,8 @@
 				.text(function(d,i) { return lookups['age_to_name'][settings['age_' + i]].age_name; }); 
 		// turn them all into sliders
 			$('[id^="menu_age_slider"]').slider({
-				min:	d3.min(age_list, function(y) { return y.age_viz; }),
-				max:	d3.max(age_list, function(y) { return y.age_viz; }),
+				min:	d3.min(age_list, function(a) { return parseInt(a.age_viz); }),
+				max:	d3.max(age_list, function(a) { return parseInt(a.age_viz); }),
 				animate:true,
 				change:	function(event, ui) {
 					$(this).parent().parent().find('.menu_slider_label').text(lookups['age_to_name'][ui.value].age_name);

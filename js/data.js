@@ -12,21 +12,21 @@
 		loaded_uncertainty = {},
 		treemap_rfs = {},
 		sbar_rfs = {};
-	geo_list.map(function(g) {
+	geo_list.forEach(function(g) {
 		estimates[g.code] = {};
 		treemap_rfs[g.code] = {};
 		sbar_rfs[g.code] = {};
-		['M', 'F'].map(function(s) {
-			estimates[g.code][s] = {};	
-			treemap_rfs[g.code][s] = {};
-			sbar_rfs[g.code][s] = {};
-			metric_list.map(function(m) {
-				estimates[g.code][s][m.val] = {};
-				treemap_rfs[g.code][s][m.val] = {};
-				sbar_rfs[g.code][s][m.val] = {};
-				risk_list.map(function(r) {
-					treemap_rfs[g.code][s][m.val][r.risk] = {};
-					sbar_rfs[g.code][s][m.val][r.risk] = {};
+		sex_list.forEach(function(s) {
+			estimates[g.code][s.val] = {};	
+			treemap_rfs[g.code][s.val] = {};
+			sbar_rfs[g.code][s.val] = {};
+			metric_list.forEach(function(m) {
+				estimates[g.code][s.val][m.val] = {};
+				treemap_rfs[g.code][s.val][m.val] = {};
+				sbar_rfs[g.code][s.val][m.val] = {};
+				risk_list.forEach(function(r) {
+					treemap_rfs[g.code][s.val][m.val][r.risk] = {};
+					sbar_rfs[g.code][s.val][m.val][r.risk] = {};
 				});
 			});
 		});

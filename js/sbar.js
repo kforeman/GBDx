@@ -4,7 +4,7 @@
 */
 
 // spacing variables
-	var risk_top_pad = 10,
+	var risk_top_pad = 33,
 		risk_left_pad = 125,
 		risk_bottom_pad = 40,
 		risk_right_pad = 22;
@@ -71,6 +71,7 @@
 		risk_x_axis = {},
 		risk_x_labels = {},
 		risk_x_title = {},
+		risk_sbar_titles = {},
 		risk_sbar_data = {},
 		risk_bar_thickness = {},
 		risk_stack_layout = {},
@@ -94,7 +95,7 @@
 		var c = canvas.canvas;
 		
 	// select the g for this plot
-		g = d3.select('#sbar_' + c);
+		var g = d3.select('#sbar_' + c);
 
 	// load in the data for this chart
 		risk_sbar_data[c] = retrieve_sbar_rf(settings['geo_' + c], settings['sex_' + c], settings['metric_' + c], settings['risk_cat_' + c]);
@@ -109,7 +110,19 @@
 			risk_y_domain[c].sort(function(a,b) {
 				return parseFloat(risk_sbar_data[c]['totals'].filter(function(d) { return d.risk == risk_lookup[b].risk; })[0]['mnm_' + settings['age_' + c] + '_' + settings['year_' + c]]) - parseFloat(risk_sbar_data[c]['totals'].filter(function(d) { return d.risk == risk_lookup[a].risk; })[0]['mnm_' + settings['age_' + c] + '_' + settings['year_' + c]]);
 			});
-		}	
+		}
+	
+	// add sbar titles
+		risk_sbar_titles[c + '_geo_units'] = g.append('text')
+			.attr('x', content_width / 2)
+			.attr('y', 14)
+			.attr('class', 'risk_sbar_title')
+			.text(lookups.geo[settings['geo_' + c]].name + ', ' + lookups.metric_labels[settings['metric_' + c]]);
+		risk_sbar_titles[c + '_age_sex'] = g.append('text')
+			.attr('x', content_width / 2)
+			.attr('y', 30)
+			.attr('class', 'risk_sbar_title')
+			.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
 	
 	// build the y axis (list of risks)
 		risk_y_scale[c] = d3.scale.ordinal().domain(risk_y_domain[c]).rangePoints([risk_top_pad, height * (c == 0 ? 1 : .5) - risk_bottom_pad], 1),
@@ -276,6 +289,13 @@
 // update the chart
 	function refresh_sbar(c) {
 		if (chart_visibility['sbar_' + c]) { 
+		
+		
+		// update sbar titles
+			risk_sbar_titles[c + '_geo_units']
+				.text(lookups.geo[settings['geo_' + c]].name + ', ' + lookups.metric_labels[settings['metric_' + c]]);
+			risk_sbar_titles[c + '_age_sex']
+				.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
 	
 		// update the data
 			risk_sbar_data[c] = retrieve_sbar_rf(settings['geo_' + c], settings['sex_' + c], settings['metric_' + c], settings['risk_cat_' + c]);

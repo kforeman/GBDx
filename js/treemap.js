@@ -109,20 +109,21 @@
 	var appended_treemap_data = {};
 
 // generate default treemap layout
+	var treemap_title_buffer = 30;
 	var treemap_layout_0 = d3.layout.treemap()
-			.size([content_width, height])
+			.size([content_width, height - treemap_title_buffer])
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
 			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'B' ? 1 : -1) : a.value - b.value; });
 	var treemap_layout_1 = d3.layout.treemap()
-			.size([content_width, height * .5])
+			.size([content_width, height * .5 - treemap_title_buffer])
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
 			.sort(function(a,b) { return a.depth == 1 ? (a.cause_viz == 'B' ? 1 : -1) : a.value - b.value; });
 	var treemap_layout_2 = d3.layout.treemap()
-			.size([content_width, height * .5])
+			.size([content_width, height * .5 - treemap_title_buffer])
 			.value(function(d) { return d.treemap_start_val; })
 			.padding(1)
 			.sticky(true)
@@ -196,14 +197,16 @@
 		tree_labels = {},
 		treemap_legends = {},
 		tree_clips = {},
-		tree_highlights = {};
+		tree_highlights = {},
+		tree_titles = {};
 			
 // loop through canvases
 	canvas_data.forEach(function(canvas) {
 		var c = canvas.canvas;
 		
 	// add a g for this treemap
-		var g = d3.select('#treemap_' + c);
+		var g = d3.select('#treemap_' + c).append('g')
+			.attr('transform', 'translate(0,' + treemap_title_buffer + ')');
 	
 	// make cells for each cause
 		tree_cells[c] = g.selectAll('tree_cells')
@@ -216,6 +219,17 @@
 			.attr('class', function(d) { return treemap_cause_classes[c][d.cause_viz]['cell'] + ' treemap_' + c + '_cell treemap_cell'; })
 			.attr('title', function(d) { return lookups['cause'][d.cause_viz] ? lookups['cause'][d.cause_viz].cause_name : '' });
 	
+	// add titles for the treemap 
+		tree_titles[c + '_geo_units'] = d3.select('#treemap_' + c).append('text')
+			.attr('x', content_width / 2)
+			.attr('y', 14)
+			.attr('class', 'treemap_title')
+			.text(lookups.geo[settings['geo_' + c]].name + ', ' + lookups.metric_labels[settings['metric_' + c]]);
+		tree_titles[c + '_age_sex'] = d3.select('#treemap_' + c).append('text')
+			.attr('x', content_width / 2)
+			.attr('y', 30)
+			.attr('class', 'treemap_title')
+			.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
 	
 	// draw a rectangle for each cause
 		tree_rects[c] = tree_cells[c].append('rect')
@@ -515,6 +529,12 @@
 			if (appended_treemap_data[geo + '_' + sex + '_' + c + '_' + metric] != 1) {
 				add_treemap_data(geo, sex, metric, c);
 			}
+		
+		// update the title
+			tree_titles[c + '_geo_units']
+				.text(lookups.geo[settings['geo_' + c]].name + ', ' + lookups.metric_labels[settings['metric_' + c]]);
+			tree_titles[c + '_age_sex']
+				.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
 			
 		// update the data
 			if (c == 0) {

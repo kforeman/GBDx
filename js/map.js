@@ -6,6 +6,44 @@
 // create the map projection
 	var map_proj = d3.geo.mercator().scale(775).translate([360, 220]),
 		map_coord = d3.geo.path().projection(map_proj);
+		
+		
+
+// custom "flat" projection
+	var flat_proj = function() {
+			var scale = 500, translate = [480, 250];
+			function flat_proj(coordinates) {	var x = (coordinates[0]) / 360,	y = (-coordinates[1]) / 360; return [ scale * x + translate[0], scale * Math.max(-.5, Math.min(.5, y)) + translate[1]]; }
+			flat_proj.scale = function(x) { if (!arguments.length) return scale; scale = +x; return flat_proj; };
+			flat_proj.translate = function(x) { if (!arguments.length) return translate; translate = [+x[0], +x[1]]; return flat_proj; };
+			return flat_proj;
+		},
+		flat_coord = d3.geo.path().projection(flat_proj);
+
+// load in the full map
+	$.ajax({
+		url: 'resources/gbdx_full_map.json',
+		dataType: 'json',
+		async: false,
+		success: function(json) {
+			full_map = json;
+		}
+	});
+
+// load in the world bank <> iso3 translator
+	$.ajax({
+		url: 'resources/wb_to_iso.csv',
+		dataType: 'text',
+		async: false,
+		success: function(csv) {
+			lookups['wb_to_iso'] = {};
+			d3.csv.parse(csv).forEach(function(m) {
+				lookups.wb_to_iso[m.wb] = m.iso;
+			});
+		}
+	});
+		
+		
+		
 
 // make a lookup for country names/regions
 	lookups['geo'] = {};
@@ -83,12 +121,12 @@
 	// title the legend
 		map_legend_titles[c + '_cause_risk'] = g.append('text')
 			.attr('dx', 400)
-			.attr('dy', 316)
+			.attr('dy', 314)
 			.attr('class', 'map_legend_title')
 			.text(lookups.cause[settings['cause_' + c]].cause_short);
 		map_legend_titles[c + '_age_sex'] = g.append('text')
 			.attr('dx', 400)
-			.attr('dy', 329)
+			.attr('dy', 328)
 			.attr('class', 'map_legend_title')
 			.text(lookups.sex[settings['sex_' + c]] + ', ' + lookups.age_to_name[settings['age_' + c]].age_name + ', ' + lookups.year_to_name[settings['year_' + c]].year_name);
 		map_legend_titles[c + '_units'] = g.append('text')
